@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { execSync } from 'child_process';
 import fs, { lstatSync } from 'fs';
 import path from 'path';
@@ -10,8 +9,12 @@ const readFile = (file) => fs.readFileSync(file);
 const writeFile = (file, content) => fs.writeFileSync(file, content);
 //#endregion
 
-
-const buildExportsMap = (targetPath, exportsMap, srcDirName, filterExportsPathFn) => {
+const buildExportsMap = (
+  targetPath,
+  exportsMap,
+  srcDirName,
+  filterExportsPathFn,
+) => {
   exportsMap = exportsMap || {};
 
   const pathstat = lstatSync(targetPath);
@@ -20,16 +23,19 @@ const buildExportsMap = (targetPath, exportsMap, srcDirName, filterExportsPathFn
     const subdirs = scanDir(targetPath);
 
     subdirs.forEach((subdir) => {
-      buildExportsMap(`${targetPath}/${subdir}`, exportsMap, srcDirName, filterExportsPathFn);
+      buildExportsMap(
+        `${targetPath}/${subdir}`,
+        exportsMap,
+        srcDirName,
+        filterExportsPathFn,
+      );
     });
   } else {
     const ext = path.extname(targetPath);
 
     const fixedPath = targetPath.replace(ext, '').replace(`${srcDirName}/`, '');
 
-    if (
-      filterExportsPathFn(fixedPath, targetPath, ext)
-    ) {
+    if (filterExportsPathFn(fixedPath, targetPath, ext)) {
       return;
     }
 
@@ -61,21 +67,32 @@ const buildExportsMap = (targetPath, exportsMap, srcDirName, filterExportsPathFn
   return exportsMap;
 };
 
+const defaultFilterExportsPathFn = (path) =>
+  path.endsWith('.store') ||
+  path.endsWith('.store.types') ||
+  path.endsWith('.types') ||
+  path.endsWith('.impl');
 
 export const postBuildScript = ({
   buildDir,
-  rootDir,
-  filesToCopy,
-  srcDirName = 'src'
+  rootDir = '.',
+  filesToCopy = [],
+  srcDirName = 'src',
+  filterExportsPathFn,
 }) => {
-  const packageJson = JSON.parse(readFile(`${rootDir}/package.json`))
+  const packageJson = JSON.parse(readFile(`${rootDir}/package.json`));
 
-  filesToCopy?.forEach(file => {
+  filesToCopy?.forEach((file) => {
     $(`cp -r ${file} ${buildDir}`);
-  })
+  });
 
   const exportsMap = {
-    ...buildExportsMap('src', {}, srcDirName),
+    ...buildExportsMap(
+      srcDirName,
+      {},
+      srcDirName,
+      filterExportsPathFn || defaultFilterExportsPathFn,
+    ),
     './package.json': './package.json',
   };
 
@@ -85,7 +102,7 @@ export const postBuildScript = ({
     ...packageJson,
     exports: exportsMap,
     files: ['*'],
-  }
+  };
 
   if (rootExport) {
     if (typeof rootExport === 'string') {
@@ -98,10 +115,6 @@ export const postBuildScript = ({
 
   writeFile(
     `${buildDir}/package.json`,
-    JSON.stringify(
-      patchedPackageJson,
-      null,
-      2,
-    ),
+    JSON.stringify(patchedPackageJson, null, 2),
   );
-}
+};
