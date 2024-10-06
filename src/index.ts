@@ -1,6 +1,4 @@
-import cp from 'node:child_process';
-import fs, { lstatSync } from 'node:fs';
-import path from 'node:path';
+import { $, fs, path, readFile, scanDir, writeFile } from './utils.js';
 
 type FilterExportsPathFunction = (
   path: string,
@@ -9,18 +7,6 @@ type FilterExportsPathFunction = (
 ) => boolean;
 
 //#region утилиты
-const $ = (cmd: string) => {
-  try {
-    // eslint-disable-next-line sonarjs/os-command
-    cp.execSync(cmd, { stdio: 'inherit', shell: '/bin/sh' });
-  } catch (error) {
-    console.error(`Не удалось выполнить команду - ${cmd}`, error);
-  }
-};
-const scanDir = (dir: string) => fs.readdirSync(dir);
-const readFile = (file: string) => fs.readFileSync(file);
-const writeFile = (file: string, content: string) =>
-  fs.writeFileSync(file, content);
 //#endregion
 
 const buildExportsMap = (
@@ -29,7 +15,7 @@ const buildExportsMap = (
   srcDirName: string,
   filterExportsPathFunction?: FilterExportsPathFunction | undefined | null,
 ) => {
-  const pathstat = lstatSync(targetPath); // Получение информации о файле или директории
+  const pathstat = fs.lstatSync(targetPath); // Получение информации о файле или директории
 
   if (pathstat.isDirectory()) {
     // Проверка, является ли путь директорией
