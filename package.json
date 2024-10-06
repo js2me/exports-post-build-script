@@ -1,21 +1,25 @@
 {
-  "name": "exports-post-build-script",
-  "version": "1.0.1",
+  "name": "js2me-exports-post-build-script",
+  "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "check": "eslint . --fix",
-
+    
     "prebuild": "npm run clean && npm run check",
-    "build": "tsc"
+    "build": "tsc",
+    "postbuild": "node ./post-build.mjs",
+    "prepub": "pnpm run build",
+    "pub": "cd dist && npm publish",
+    "postpub": "npm run clean"
   },
   "keywords": [],
   "module": "true",
   "type": "module",
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "22.7.4",
     "eslint": "8.57.0",
