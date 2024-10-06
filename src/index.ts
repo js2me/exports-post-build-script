@@ -12,7 +12,7 @@ type FilterExportsPathFunction = (
 const $ = (cmd: string) => {
   try {
     // eslint-disable-next-line sonarjs/os-command
-    cp.execSync(cmd, { stdio: 'inherit', shell: 'linux' });
+    cp.execSync(cmd, { stdio: 'inherit', shell: '/bin/sh' });
   } catch (error) {
     console.error(`Не удалось выполнить команду - ${cmd}`, error);
   }
