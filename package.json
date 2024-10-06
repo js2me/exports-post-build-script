@@ -2,17 +2,25 @@
   "name": "exports-post-build-script",
   "version": "1.0.1",
   "description": "",
-  "main": "index.mjs",
-  "scripts": {},
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rimraf dist",
+    "check": "eslint . --fix",
+
+    "prebuild": "npm run clean && npm run check",
+    "build": "tsc"
+  },
   "keywords": [],
   "module": "true",
+  "type": "module",
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "22.7.4",
     "eslint": "8.57.0",
-    "js2me-eslint-config": "1.0.0",
+    "js2me-eslint-config": "1.0.4",
     "rimraf": "6.0.1",
     "typescript": "5.4.5"
   }
 }
-
