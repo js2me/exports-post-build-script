@@ -15,14 +15,17 @@ const buildExportsMap = (
   srcDirName,
   filterExportsPathFn,
 ) => {
-  exportsMap = exportsMap || {};
+  exportsMap = exportsMap || {}; // Инициализация карты экспортов, если она не передана
 
-  const pathstat = lstatSync(targetPath);
+  const pathstat = lstatSync(targetPath); // Получение информации о файле или директории
 
   if (pathstat.isDirectory()) {
-    const subdirs = scanDir(targetPath);
+    // Проверка, является ли путь директорией
+    const subdirs = scanDir(targetPath); // Сканирование поддиректорий
 
+    // Итерация по каждой поддиректории
     subdirs.forEach((subdir) => {
+      // Рекурсивный вызов для каждой поддиректории
       buildExportsMap(
         `${targetPath}/${subdir}`,
         exportsMap,
@@ -33,19 +36,24 @@ const buildExportsMap = (
   } else {
     const ext = path.extname(targetPath);
 
+    // Удаление расширения и имени исходной директории
     const fixedPath = targetPath.replace(ext, '').replace(`${srcDirName}/`, '');
 
+    // Применение фильтра для исключения определенных путей
     if (filterExportsPathFn(fixedPath, targetPath, ext)) {
-      return;
+      return; // Если путь исключен, выходим из функции
     }
 
+    // Проверка, является ли файл TypeScript
     if (ext === '.ts' || ext === '.tsx') {
+      // Обработка файла index
       if (fixedPath === 'index') {
         exportsMap[`.`] = {
           import: `./${fixedPath}.js`,
           default: `./${fixedPath}.js`,
           types: `./${fixedPath}.d.ts`,
         };
+        // Обработка других файлов с индексом в конце пути
       } else if (fixedPath.endsWith('/index')) {
         exportsMap[`./${fixedPath.split('/').slice(0, -1).join('/')}`] = {
           import: `./${fixedPath}.js`,
@@ -73,12 +81,26 @@ const defaultFilterExportsPathFn = (path) =>
   path.endsWith('.types') ||
   path.endsWith('.impl');
 
+/**
+ * Выполняет действия после сборки проекта.
+ *
+ * @param {Object} options - Опции для настройки функции.
+ * @param {string} options.buildDir - Директория для сборки.
+ * @param {string} [options.rootDir='.'] - Корневая директория проекта.
+ * @param {Array<string>} [options.filesToCopy=[]] - Список файлов для копирования.
+ * @param {string} [options.srcDirName='src'] - Имя директории с исходным кодом.
+ * @param {Function} [options.filterExportsPathFn] - Функция-фильтр для путей экспортов.
+ * @param {Function} [options.patchPackageJson] - Функция для изменения объекта package.json.
+ *
+ * @returns {void}
+ */
 export const postBuildScript = ({
   buildDir,
   rootDir = '.',
   filesToCopy = [],
   srcDirName = 'src',
   filterExportsPathFn,
+  patchPackageJson,
 }) => {
   const packageJson = JSON.parse(readFile(`${rootDir}/package.json`));
 
@@ -112,6 +134,8 @@ export const postBuildScript = ({
       patchedPackageJson.typings = rootExport.types;
     }
   }
+
+  patchPackageJson?.(patchedPackageJson);
 
   writeFile(
     `${buildDir}/package.json`,
