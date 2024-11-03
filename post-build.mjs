@@ -12,7 +12,8 @@ postBuildScript({
       $('cd dist && pnpm publish && cd ..');
       $('git push');
       $(`git tag -a v${next} -m v${prev}`);
-      $(`git push origin v${next}`)
+      $(`git push origin v${next}`);
+      $('npm run clean');
     }
   }
 });
