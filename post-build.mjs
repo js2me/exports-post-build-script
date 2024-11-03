@@ -9,8 +9,10 @@ postBuildScript({
     if (process.env.PUBLISH) {
       $('git add .');
       $(`git commit -m "bump: update to version ${next} from ${prev}"`);
-      $('cd dist');
-      $('pnpm publish');
+      $('cd dist && pnpm publish && cd ..');
+      $('git push');
+      $(`git tag -a v${next} -m v${prev}`);
+      $(`git push origin v${next}`)
     }
   }
 });
