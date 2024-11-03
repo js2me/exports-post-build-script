@@ -1,13 +1,34 @@
-import { $, fs, path, readFile, scanDir, writeFile } from './utils.js';
+import { FilterExportsPathFunction, PostBuildScriptConfig } from './types.js';
+import * as utils from './utils.js';
 
-type FilterExportsPathFunction = (
-  path: string,
-  targetPath: string,
-  extension: string,
-) => boolean;
+const { $, fs, path, readFile, scanDir, writeFile } = utils;
 
-//#region утилиты
-//#endregion
+const tryToFindPackageVersionChanged = (gitDiffResult: string | undefined) => {
+  if (!gitDiffResult) {
+    return null;
+  }
+
+  const lines = gitDiffResult.split('/n');
+  let prevVersion: string | null = null;
+  let nextVersion: string | null = null;
+
+  for (const line of lines) {
+    if (line.includes('-  "version":')) {
+      const rawVersion = line.split('-  "version":')[1];
+      const [, version] = rawVersion.split('"');
+      prevVersion = version;
+    }
+    if (line.includes('+  "version":')) {
+      const rawVersion = line.split('+  "version":')[1];
+      const [, version] = rawVersion.split('"');
+      nextVersion = version;
+
+      return { nextVersion, prevVersion };
+    }
+  }
+
+  return null;
+};
 
 const buildExportsMap = (
   targetPath: string,
@@ -81,36 +102,6 @@ const defaultFilterExportsPathFunction: FilterExportsPathFunction = (path) =>
   path.endsWith('.types') ||
   path.endsWith('.impl');
 
-interface PostBuildScriptConfig {
-  /**
-   * Директория для сборки.
-   */
-  buildDir: string;
-  /**
-   *  Корневая директория проекта.
-   *  @default .
-   */
-  rootDir?: string;
-  /**
-   * Список файлов для копирования.
-   * @default []
-   */
-  filesToCopy?: string[];
-  /**
-   * Имя директории с исходным кодом.
-   * @default src
-   */
-  srcDirName?: string;
-  /**
-   * Функция-фильтр для путей экспортов.
-   */
-  filterExportsPathFn?: FilterExportsPathFunction;
-  /**
-   * Функция для изменения объекта package.json.
-   */
-  patchPackageJson?: (packageJson: Record<string, any>) => void;
-}
-
 /**
  * Выполняет действия после сборки проекта.
  */
@@ -121,6 +112,7 @@ export const postBuildScript = ({
   srcDirName = 'src',
   filterExportsPathFn = defaultFilterExportsPathFunction,
   patchPackageJson,
+  onPackageVersionChanged,
 }: PostBuildScriptConfig) => {
   const packageJson = JSON.parse(
     readFile(`${rootDir}/package.json`).toString(),
@@ -163,4 +155,22 @@ export const postBuildScript = ({
     `${buildDir}/package.json`,
     JSON.stringify(patchedPackageJson, null, 2),
   );
+
+  const gitDiffCachedResult = $(
+    `git diff --cached ${rootDir}/package.json | cat`,
+    'pipe',
+  );
+  const gitDiffResult = $(`git diff ${rootDir}/package.json | cat`, 'pipe');
+
+  const versionsDiff =
+    tryToFindPackageVersionChanged(gitDiffCachedResult) ??
+    tryToFindPackageVersionChanged(gitDiffResult);
+
+  if (versionsDiff) {
+    onPackageVersionChanged?.(
+      versionsDiff.nextVersion,
+      versionsDiff.prevVersion,
+      utils,
+    );
+  }
 };

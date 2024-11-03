@@ -1,6 +1,6 @@
 {
   "name": "js2me-exports-post-build-script",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -11,8 +11,7 @@
     "prebuild": "npm run clean && npm run check",
     "build": "tsc",
     "postbuild": "node ./post-build.mjs",
-    "prepub": "pnpm run build",
-    "pub": "cd dist && npm publish",
+    "pub": "PUBLISH=true pnpm run build",
     "postpub": "npm run clean"
   },
   "keywords": [],
@@ -20,6 +19,9 @@
   "type": "module",
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "simple-git": "3.27.0"
+  },
   "devDependencies": {
     "@types/node": "22.7.4",
     "eslint": "8.57.0",

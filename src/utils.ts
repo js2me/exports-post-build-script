@@ -1,11 +1,11 @@
-import cp from 'node:child_process';
+import cp, { StdioOptions } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-export const $ = (cmd: string) => {
+export const $ = (cmd: string, stdio: StdioOptions = 'inherit') => {
   try {
     // eslint-disable-next-line sonarjs/os-command
-    cp.execSync(cmd, { stdio: 'inherit', shell: '/bin/sh' });
+    return cp.execSync(cmd, { stdio, shell: '/bin/sh' })?.toString();
   } catch (error) {
     console.error(`Не удалось выполнить команду - ${cmd}`, error);
   }
