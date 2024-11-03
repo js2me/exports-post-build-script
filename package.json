@@ -1,6 +1,6 @@
 {
   "name": "js2me-exports-post-build-script",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -10,7 +10,6 @@
     
     "prebuild": "npm run clean && npm run check",
     "build": "tsc && node ./post-build.mjs",
-    "postbuild": "node ./post-build.mjs",
     "pub": "PUBLISH=true pnpm run build"
   },
   "keywords": [],
