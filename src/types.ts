@@ -38,17 +38,19 @@ export interface PostBuildScriptConfig {
   patchPackageJson?: (packageJson: Record<string, any>) => void;
 
   onPackageVersionChanged?: (
-    currentVersion: string,
-    previousVersion: string | null,
+    nextVersion: string,
+    currentVersion: string | null,
     utils: FsUtils,
   ) => void;
 }
 
 export interface PublishScriptConfig {
   nextVersion: string;
-  prevVersion: string | null;
+  currVersion: string | null;
   publishCommand: string;
   commitAllCurrentChanges?: boolean;
+  logCommitTags?: string[];
   createTag?: boolean;
   cleanupCommand?: string;
+  githubRepoLink: string;
 }

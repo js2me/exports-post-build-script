@@ -5,11 +5,11 @@ postBuildScript({
   rootDir: '.',
   srcDirName: 'src',
   filesToCopy: ['LICENSE', 'README.md'],
-  onPackageVersionChanged: (nextVersion, prevVersion, { $ }) => {
+  onPackageVersionChanged: (nextVersion, currVersion) => {
     if (process.env.PUBLISH) {
       publishScript({
         nextVersion,
-        prevVersion,
+        currVersion,
         publishCommand: 'pnpm publish',
         commitAllCurrentChanges: true,
         createTag: true,

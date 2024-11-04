@@ -1,26 +1,49 @@
 import { PublishScriptConfig } from './types.js';
 import { $ } from './utils/fs.js';
+import { getCommitsFromTagToHead } from './utils/get-commits-from-tag-to-head.js';
 
 export const publishScript = ({
   nextVersion,
-  prevVersion,
+  currVersion,
   publishCommand,
+  logCommitTags = [
+    'feat',
+    'feat',
+    'BREAKING_CHANGE',
+    'fix',
+    'BREAKING CHANGE',
+    'Initial commit',
+    'initial commit',
+  ],
   commitAllCurrentChanges,
   createTag,
   cleanupCommand,
+  githubRepoLink,
 }: PublishScriptConfig) => {
   if (commitAllCurrentChanges) {
     $('git add .');
-    $(
-      `git commit -m "bump: update to version ${nextVersion} from ${prevVersion}"`,
-    );
+    $(`git commit -m "bump: ${nextVersion}"`);
     $('git push');
   }
 
   $(`cd dist && ${publishCommand} && cd ..`);
 
   if (createTag) {
-    $(`git tag -a v${nextVersion} -m v${prevVersion}`);
+    const commits = getCommitsFromTagToHead(currVersion).filter((it) =>
+      logCommitTags.some((commitTag) => it.startsWith(commitTag)),
+    );
+
+    console.info('commits', commits);
+
+    const tagMessageLines: string[] = [
+      `## What's Changed`,
+      ...commits.map((commit) => `* ${commit}`),
+      `**Full Changelog**: ${githubRepoLink}/compare/${currVersion}...${nextVersion}`,
+    ];
+
+    const tagMessage = tagMessageLines.join('\n');
+
+    $(`git tag -a v${nextVersion} -m "${tagMessage}"`);
     $(`git push origin v${nextVersion}`);
   }
 
