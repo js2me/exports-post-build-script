@@ -29,14 +29,18 @@ export const publishScript = ({
   $(`cd dist && ${publishCommand} && cd ..`);
 
   if (createTag) {
-    const commits = getCommitsFromTagToHead(currVersion && `v${currVersion}`).filter((it) =>
+    const commits = getCommitsFromTagToHead(
+      currVersion && `v${currVersion}`,
+    ).filter((it) =>
       logCommitTags.some((commitTag) => it.startsWith(commitTag)),
     );
 
     const tagMessageLines: string[] = [
       `## What's Changed`,
       ...commits.map((commit) => `* ${commit}`),
-      currVersion ? `**Full Changelog**: ${githubRepoLink}/compare/v${currVersion}...v${nextVersion}` : '',
+      currVersion
+        ? `**Full Changelog**: ${githubRepoLink}/compare/v${currVersion}...v${nextVersion}`
+        : '',
     ];
 
     const tagMessage = tagMessageLines.join('\n');
