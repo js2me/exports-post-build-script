@@ -141,9 +141,14 @@ export const postBuildScript = ({
           packageJson.version,
           'major',
         );
+        patchedPackageJson.version = packageJson.version;
         writeFile(
           `${rootDir}/package.json`,
           JSON.stringify(packageJson, null, 2),
+        );
+        writeFile(
+          `${buildDir}/package.json`,
+          JSON.stringify(patchedPackageJson, null, 2),
         );
         break;
       }
@@ -152,9 +157,14 @@ export const postBuildScript = ({
           packageJson.version,
           'minor',
         );
+        patchedPackageJson.version = packageJson.version;
         writeFile(
           `${rootDir}/package.json`,
           JSON.stringify(packageJson, null, 2),
+        );
+        writeFile(
+          `${buildDir}/package.json`,
+          JSON.stringify(patchedPackageJson, null, 2),
         );
         break;
       }
@@ -163,9 +173,14 @@ export const postBuildScript = ({
           packageJson.version,
           'patch',
         );
+        patchedPackageJson.version = packageJson.version;
         writeFile(
           `${rootDir}/package.json`,
           JSON.stringify(packageJson, null, 2),
+        );
+        writeFile(
+          `${buildDir}/package.json`,
+          JSON.stringify(patchedPackageJson, null, 2),
         );
         break;
       }
