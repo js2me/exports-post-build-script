@@ -22,21 +22,21 @@ export const publishScript = ({
 }: PublishScriptConfig) => {
   if (commitAllCurrentChanges) {
     $('git add .');
-    $(`git commit -m "bump: ${nextVersion}"`);
+    $(`git commit -m "bump: v${nextVersion}"`);
     $('git push');
   }
 
   $(`cd dist && ${publishCommand} && cd ..`);
 
   if (createTag) {
-    const commits = getCommitsFromTagToHead(currVersion).filter((it) =>
+    const commits = getCommitsFromTagToHead(currVersion && `v${currVersion}`).filter((it) =>
       logCommitTags.some((commitTag) => it.startsWith(commitTag)),
     );
 
     const tagMessageLines: string[] = [
       `## What's Changed`,
       ...commits.map((commit) => `* ${commit}`),
-      `**Full Changelog**: ${githubRepoLink}/compare/${currVersion}...${nextVersion}`,
+      currVersion ? `**Full Changelog**: ${githubRepoLink}/compare/v${currVersion}...v${nextVersion}` : '',
     ];
 
     const tagMessage = tagMessageLines.join('\n');
