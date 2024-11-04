@@ -1,6 +1,7 @@
 import { FilterExportsPathFunction, PostBuildScriptConfig } from './types.js';
 import * as utils from './utils/fs.js';
 import { getPackageVersionDiff } from './utils/get-package-version-diff.js';
+import { updatePackageVersion } from './utils/update-package-version.js';
 
 const { $, fs, path, readFile, scanDir, writeFile } = utils;
 
@@ -87,6 +88,7 @@ export const postBuildScript = ({
   filterExportsPathFn = defaultFilterExportsPathFunction,
   patchPackageJson,
   onPackageVersionChanged,
+  updateVersion,
 }: PostBuildScriptConfig) => {
   const packageJson = JSON.parse(
     readFile(`${rootDir}/package.json`).toString(),
@@ -130,7 +132,38 @@ export const postBuildScript = ({
     JSON.stringify(patchedPackageJson, null, 2),
   );
 
-  const versionsDiff = getPackageVersionDiff(`${rootDir}/package.json`);
+  let versionsDiff = getPackageVersionDiff(`${rootDir}/package.json`);
+
+  if (!versionsDiff && updateVersion) {
+    switch(updateVersion){
+      case 'major': {
+        packageJson.version = updatePackageVersion(packageJson.version, 'major');
+        writeFile(
+          `${rootDir}/package.json`,
+          JSON.stringify(packageJson, null, 2),
+        );
+        break;
+      }
+      case 'minor': {
+        packageJson.version = updatePackageVersion(packageJson.version, 'minor');
+        writeFile(
+          `${rootDir}/package.json`,
+          JSON.stringify(packageJson, null, 2),
+        );
+        break;
+      }
+      case 'patch': {
+        packageJson.version = updatePackageVersion(packageJson.version, 'patch');
+        writeFile(
+          `${rootDir}/package.json`,
+          JSON.stringify(packageJson, null, 2),
+        );
+        break;
+      }
+      default: break;
+    }
+    versionsDiff = getPackageVersionDiff(`${rootDir}/package.json`);
+  }
 
   if (versionsDiff) {
     onPackageVersionChanged?.(
