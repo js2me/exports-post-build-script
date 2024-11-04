@@ -1,6 +1,6 @@
-import * as utils from './utils.js';
+import * as fsUtils from './utils/fs.js';
 
-type UtilsType = typeof utils;
+export type FsUtils = typeof fsUtils;
 
 export type FilterExportsPathFunction = (
   path: string,
@@ -40,6 +40,15 @@ export interface PostBuildScriptConfig {
   onPackageVersionChanged?: (
     currentVersion: string,
     previousVersion: string | null,
-    utils: UtilsType,
+    utils: FsUtils,
   ) => void;
+}
+
+export interface PublishScriptConfig {
+  nextVersion: string;
+  prevVersion: string | null;
+  publishCommand: string;
+  commitAllCurrentChanges?: boolean;
+  createTag?: boolean;
+  cleanupCommand?: string;
 }
