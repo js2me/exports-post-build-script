@@ -43,7 +43,7 @@ export interface PostBuildScriptConfig {
     utils: FsUtils,
   ) => void;
 
-  updateVersion?: 'minor' | 'major' | 'patch'
+  updateVersion?: 'minor' | 'major' | 'patch';
 }
 
 export interface PublishScriptConfig {

@@ -135,9 +135,12 @@ export const postBuildScript = ({
   let versionsDiff = getPackageVersionDiff(`${rootDir}/package.json`);
 
   if (!versionsDiff && updateVersion) {
-    switch(updateVersion){
+    switch (updateVersion) {
       case 'major': {
-        packageJson.version = updatePackageVersion(packageJson.version, 'major');
+        packageJson.version = updatePackageVersion(
+          packageJson.version,
+          'major',
+        );
         writeFile(
           `${rootDir}/package.json`,
           JSON.stringify(packageJson, null, 2),
@@ -145,7 +148,10 @@ export const postBuildScript = ({
         break;
       }
       case 'minor': {
-        packageJson.version = updatePackageVersion(packageJson.version, 'minor');
+        packageJson.version = updatePackageVersion(
+          packageJson.version,
+          'minor',
+        );
         writeFile(
           `${rootDir}/package.json`,
           JSON.stringify(packageJson, null, 2),
@@ -153,14 +159,19 @@ export const postBuildScript = ({
         break;
       }
       case 'patch': {
-        packageJson.version = updatePackageVersion(packageJson.version, 'patch');
+        packageJson.version = updatePackageVersion(
+          packageJson.version,
+          'patch',
+        );
         writeFile(
           `${rootDir}/package.json`,
           JSON.stringify(packageJson, null, 2),
         );
         break;
       }
-      default: break;
+      default: {
+        break;
+      }
     }
     versionsDiff = getPackageVersionDiff(`${rootDir}/package.json`);
   }
