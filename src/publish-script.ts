@@ -33,8 +33,6 @@ export const publishScript = ({
       logCommitTags.some((commitTag) => it.startsWith(commitTag)),
     );
 
-    console.info('commits', commits);
-
     const tagMessageLines: string[] = [
       `## What's Changed`,
       ...commits.map((commit) => `* ${commit}`),
