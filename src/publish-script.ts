@@ -40,7 +40,7 @@ export const publishScript = ({
       ...commits.map((commit) => `* ${commit}`),
       currVersion
         ? `**Full Changelog**: ${githubRepoLink}/compare/v${currVersion}...v${nextVersion}`
-        : '',
+        : `**Full Changelog**: ${githubRepoLink}/commits/${nextVersion}`,
     ];
 
     const tagMessage = tagMessageLines.join('\n');
