@@ -89,6 +89,7 @@ export const postBuildScript = ({
   patchPackageJson,
   onPackageVersionChanged,
   updateVersion,
+  onDone,
 }: PostBuildScriptConfig) => {
   const packageJson = JSON.parse(
     readFile(`${rootDir}/package.json`).toString(),
@@ -199,5 +200,15 @@ export const postBuildScript = ({
     );
   } else {
     console.info('Версии пакета не изменились');
+  }
+
+  if (onDone) {
+    onDone(
+      versionsDiff && {
+        current: versionsDiff.prevVersion,
+        next: versionsDiff.nextVersion,
+      },
+      utils,
+    );
   }
 };

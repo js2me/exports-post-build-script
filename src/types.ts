@@ -43,6 +43,11 @@ export interface PostBuildScriptConfig {
     utils: FsUtils,
   ) => void;
 
+  onDone?: (
+    versionsDiff: null | { next: string; current: string | null },
+    utils: FsUtils,
+  ) => void;
+
   updateVersion?: 'minor' | 'major' | 'patch';
 }
 
