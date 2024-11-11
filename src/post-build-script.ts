@@ -197,6 +197,7 @@ export const postBuildScript = ({
       versionsDiff.nextVersion,
       versionsDiff.prevVersion,
       utils,
+      packageJson,
     );
   } else {
     console.info('Версии пакета не изменились');
@@ -209,6 +210,7 @@ export const postBuildScript = ({
         next: versionsDiff.nextVersion,
       },
       utils,
+      packageJson,
     );
   }
 };

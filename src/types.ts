@@ -41,11 +41,13 @@ export interface PostBuildScriptConfig {
     nextVersion: string,
     currentVersion: string | null,
     utils: FsUtils,
+    packageJson: Record<string, any>,
   ) => void;
 
   onDone?: (
     versionsDiff: null | { next: string; current: string | null },
     utils: FsUtils,
+    packageJson: Record<string, any>,
   ) => void;
 
   updateVersion?: 'minor' | 'major' | 'patch';
