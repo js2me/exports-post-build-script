@@ -45,8 +45,12 @@ export const publishScript = ({
 
     const tagMessage = tagMessageLines.join('\n');
 
-    $(`git tag -a v${nextVersion} -m "${tagMessage}"`);
-    $(`git push origin v${nextVersion}`);
+    try {
+      $(`git tag -a v${nextVersion} -m "${tagMessage}"`);
+      $(`git push origin v${nextVersion}`);
+    } catch (error) {
+      console.error('не удалось сделать и запушить тег', error);
+    }
   }
 
   if (cleanupCommand) {
