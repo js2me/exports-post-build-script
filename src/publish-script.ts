@@ -30,13 +30,17 @@ export const publishScript = ({
 
   if (commitAllCurrentChanges) {
     $('git add .');
-    $(`git commit -m "bump: v${nextVersion}"`);
+    if (nextVersion == null) {
+      $(`git commit -m "bump: publish last version"`);
+    } else {
+      $(`git commit -m "bump: v${nextVersion}"`);
+    }
     $('git push');
   }
 
   $(`cd dist && ${publishCommand} && cd ..`);
 
-  if (createTag) {
+  if (createTag && nextVersion != null) {
     const commits = getCommitsFromTagToHead(
       currVersion && `v${currVersion}`,
     ).filter((it) =>
