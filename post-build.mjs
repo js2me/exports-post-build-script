@@ -9,8 +9,8 @@ postBuildScript({
   onDone: (versionsDiff) => {
     if (process.env.PUBLISH) {
       publishScript({
-        nextVersion: versionsDiff.next,
-        currVersion: versionsDiff.current,
+        nextVersion: versionsDiff?.next,
+        currVersion: versionsDiff?.current,
         publishCommand: 'pnpm publish',
         commitAllCurrentChanges: true,
         createTag: true,
