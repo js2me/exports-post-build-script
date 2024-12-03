@@ -66,8 +66,6 @@ export const publishScript = ({
   }
 
   if (otherNames?.length && targetPackageJson) {
-    $(`cd dist`);
-
     const currentName = targetPackageJson.data.name;
 
     for (const otherName of otherNames) {
@@ -75,14 +73,12 @@ export const publishScript = ({
         name: otherName,
       });
 
-      $(publishCommand);
+      $(`cd dist && ${publishCommand} && cd ..`);
     }
 
     targetPackageJson.update({
       name: currentName,
     });
-
-    $(`cd ..`);
   }
 
   if (cleanupCommand) {
