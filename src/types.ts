@@ -1,4 +1,5 @@
 import * as fsUtils from './utils/fs.js';
+import { PackageJsonManager } from './utils/package-json-manager.js';
 
 export type FsUtils = typeof fsUtils;
 
@@ -32,10 +33,6 @@ export interface PostBuildScriptConfig {
    * Функция-фильтр для путей экспортов.
    */
   filterExportsPathFn?: FilterExportsPathFunction;
-  /**
-   * Функция для изменения объекта package.json.
-   */
-  patchPackageJson?: (packageJson: Record<string, any>) => void;
 
   onPackageVersionChanged?: (
     nextVersion: string,
@@ -48,6 +45,9 @@ export interface PostBuildScriptConfig {
     versionsDiff: null | { next: string; current: string | null },
     utils: FsUtils,
     packageJson: Record<string, any>,
+    output: {
+      targetPackageJson: PackageJsonManager;
+    },
   ) => void;
 
   updateVersion?: 'minor' | 'major' | 'patch';
@@ -62,4 +62,6 @@ export interface PublishScriptConfig {
   createTag?: boolean;
   cleanupCommand?: string;
   githubRepoLink: string;
+  otherNames?: string;
+  targetPackageJson?: PackageJsonManager;
 }

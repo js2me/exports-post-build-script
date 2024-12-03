@@ -19,7 +19,15 @@ export const publishScript = ({
   createTag,
   cleanupCommand,
   githubRepoLink,
+  otherNames,
+  targetPackageJson,
 }: PublishScriptConfig) => {
+  if (otherNames?.length && !targetPackageJson) {
+    throw new Error(
+      'Для правильной работы otherNames необходим targetPackageJson - которая будет патчить package.json в dist',
+    );
+  }
+
   if (commitAllCurrentChanges) {
     $('git add .');
     $(`git commit -m "bump: v${nextVersion}"`);
@@ -51,6 +59,26 @@ export const publishScript = ({
     } catch (error) {
       console.error('не удалось сделать и запушить тег', error);
     }
+  }
+
+  if (otherNames?.length && targetPackageJson) {
+    $(`cd dist`);
+
+    const currentName = targetPackageJson.data.name;
+
+    for (const otherName of otherNames) {
+      targetPackageJson.update({
+        name: otherName,
+      });
+
+      $(publishCommand);
+    }
+
+    targetPackageJson.update({
+      name: currentName,
+    });
+
+    $(`cd ..`);
   }
 
   if (cleanupCommand) {

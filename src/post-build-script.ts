@@ -1,9 +1,10 @@
 import { FilterExportsPathFunction, PostBuildScriptConfig } from './types.js';
 import * as utils from './utils/fs.js';
 import { getPackageVersionDiff } from './utils/get-package-version-diff.js';
+import { PackageJsonManager } from './utils/package-json-manager.js';
 import { updatePackageVersion } from './utils/update-package-version.js';
 
-const { $, fs, path, readFile, scanDir, writeFile } = utils;
+const { $, fs, path, scanDir } = utils;
 
 const buildExportsMap = (
   targetPath: string,
@@ -86,14 +87,11 @@ export const postBuildScript = ({
   filesToCopy = [],
   srcDirName = 'src',
   filterExportsPathFn = defaultFilterExportsPathFunction,
-  patchPackageJson,
   onPackageVersionChanged,
   updateVersion,
   onDone,
 }: PostBuildScriptConfig) => {
-  const packageJson = JSON.parse(
-    readFile(`${rootDir}/package.json`).toString(),
-  );
+  const packageJson = new PackageJsonManager(`${rootDir}/package.json`);
 
   filesToCopy?.forEach((file) => {
     $(`cp -r ${file} ${buildDir}`);
@@ -111,78 +109,52 @@ export const postBuildScript = ({
 
   const rootExport = exportsMap['.'];
 
-  const patchedPackageJson = {
+  const targetPackageJson = new PackageJsonManager(`${buildDir}/package.json`, {
     ...packageJson,
     exports: exportsMap,
     files: ['*'],
-  };
+  });
 
   if (rootExport) {
     if (typeof rootExport === 'string') {
-      patchedPackageJson.main = rootExport;
+      targetPackageJson.data.main = rootExport;
     } else {
-      patchedPackageJson.main = rootExport.import;
-      patchedPackageJson.typings = rootExport.types;
+      targetPackageJson.data.main = rootExport.import;
+      targetPackageJson.data.typings = rootExport.types;
     }
   }
 
-  patchPackageJson?.(patchedPackageJson);
-
-  writeFile(
-    `${buildDir}/package.json`,
-    JSON.stringify(patchedPackageJson, null, 2),
-  );
+  targetPackageJson.syncWithFs();
 
   let versionsDiff = getPackageVersionDiff(`${rootDir}/package.json`);
 
   if (!versionsDiff && updateVersion) {
     switch (updateVersion) {
       case 'major': {
-        packageJson.version = updatePackageVersion(
-          packageJson.version,
+        const nextVersion = updatePackageVersion(
+          packageJson.data.version,
           'major',
         );
-        patchedPackageJson.version = packageJson.version;
-        writeFile(
-          `${rootDir}/package.json`,
-          JSON.stringify(packageJson, null, 2),
-        );
-        writeFile(
-          `${buildDir}/package.json`,
-          JSON.stringify(patchedPackageJson, null, 2),
-        );
+        packageJson.update({ version: nextVersion });
+        targetPackageJson.update({ version: nextVersion });
         break;
       }
       case 'minor': {
-        packageJson.version = updatePackageVersion(
-          packageJson.version,
+        const nextVersion = updatePackageVersion(
+          packageJson.data.version,
           'minor',
         );
-        patchedPackageJson.version = packageJson.version;
-        writeFile(
-          `${rootDir}/package.json`,
-          JSON.stringify(packageJson, null, 2),
-        );
-        writeFile(
-          `${buildDir}/package.json`,
-          JSON.stringify(patchedPackageJson, null, 2),
-        );
+        packageJson.update({ version: nextVersion });
+        targetPackageJson.update({ version: nextVersion });
         break;
       }
       case 'patch': {
-        packageJson.version = updatePackageVersion(
-          packageJson.version,
+        const nextVersion = updatePackageVersion(
+          packageJson.data.version,
           'patch',
         );
-        patchedPackageJson.version = packageJson.version;
-        writeFile(
-          `${rootDir}/package.json`,
-          JSON.stringify(packageJson, null, 2),
-        );
-        writeFile(
-          `${buildDir}/package.json`,
-          JSON.stringify(patchedPackageJson, null, 2),
-        );
+        packageJson.update({ version: nextVersion });
+        targetPackageJson.update({ version: nextVersion });
         break;
       }
       default: {
@@ -210,7 +182,10 @@ export const postBuildScript = ({
         next: versionsDiff.nextVersion,
       },
       utils,
-      packageJson,
+      packageJson.data,
+      {
+        targetPackageJson,
+      },
     );
   }
 };
