@@ -110,7 +110,7 @@ export const postBuildScript = ({
   const rootExport = exportsMap['.'];
 
   const targetPackageJson = new PackageJsonManager(`${buildDir}/package.json`, {
-    ...packageJson,
+    ...packageJson.data,
     exports: exportsMap,
     files: ['*'],
   });

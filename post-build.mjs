@@ -6,16 +6,16 @@ postBuildScript({
   srcDirName: 'src',
   filesToCopy: ['LICENSE', 'README.md'],
   updateVersion: process.env.PUBLISH_VERSION,
-  onPackageVersionChanged: (nextVersion, currVersion) => {
+  onDone: (versionsDiff) => {
     if (process.env.PUBLISH) {
       publishScript({
-        nextVersion,
-        currVersion,
+        nextVersion: versionsDiff.next,
+        currVersion: versionsDiff.current,
         publishCommand: 'pnpm publish',
         commitAllCurrentChanges: true,
         createTag: true,
         githubRepoLink: 'https://github.com/js2me/exports-post-build-script',
-        cleanupCommand: 'npm run clean',  
+        cleanupCommand: 'npm run clean',
       });
     }
   }
