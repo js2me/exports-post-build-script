@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { PublishScriptConfig } from './types.js';
 import { $ } from './utils/fs.js';
 import { getCommitsFromTagToHead } from './utils/get-commits-from-tag-to-head.js';
@@ -38,7 +39,7 @@ export const publishScript = ({
     $('git push');
   }
 
-  $(`cd dist && ${publishCommand} && cd ..`);
+  $(`cd dist && ${publishCommand} && cd ..`, undefined, true);
 
   if (createTag && nextVersion != null) {
     const commits = getCommitsFromTagToHead(
