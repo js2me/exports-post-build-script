@@ -6,7 +6,6 @@ import { getCommitsFromTagToHead } from './utils/get-commits-from-tag-to-head.js
 export const publishScript = ({
   nextVersion,
   currVersion,
-  publishCommand,
   logCommitTags = [
     'feat',
     'feat',
@@ -19,6 +18,8 @@ export const publishScript = ({
   commitAllCurrentChanges,
   createTag,
   cleanupCommand,
+  packageManager,
+  tag,
   githubRepoLink,
   otherNames,
   targetPackageJson,
@@ -37,6 +38,23 @@ export const publishScript = ({
       $(`git commit -m "bump: v${nextVersion}"`);
     }
     $('git push');
+  }
+
+  let publishCommand: string;
+
+  switch (packageManager) {
+    case 'pnpm': {
+      publishCommand = 'pnpm publish';
+      break;
+    }
+    case 'npm': {
+      publishCommand = 'npm publish';
+      break;
+    }
+  }
+
+  if (tag) {
+    publishCommand += ` --tag ${tag}`;
   }
 
   $(`cd dist && ${publishCommand} && cd ..`, undefined, true);

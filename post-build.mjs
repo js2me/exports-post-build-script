@@ -11,7 +11,7 @@ postBuildScript({
       publishScript({
         nextVersion: versionsDiff?.next,
         currVersion: versionsDiff?.current,
-        publishCommand: 'pnpm publish',
+        packageManager: 'pnpm',
         commitAllCurrentChanges: true,
         createTag: true,
         githubRepoLink: 'https://github.com/js2me/exports-post-build-script',

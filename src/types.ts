@@ -56,7 +56,11 @@ export interface PostBuildScriptConfig {
 export interface PublishScriptConfig {
   nextVersion: string;
   currVersion: string | null;
-  publishCommand: string;
+  /**
+   * Тег для публикации
+   */
+  tag?: string;
+  packageManager: 'pnpm' | 'npm';
   commitAllCurrentChanges?: boolean;
   logCommitTags?: string[];
   createTag?: boolean;
