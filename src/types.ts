@@ -60,6 +60,7 @@ export interface PublishScriptConfig {
    * Тег для публикации
    */
   tag?: string;
+  force?: boolean;
   packageManager: 'pnpm' | 'npm';
   commitAllCurrentChanges?: boolean;
   logCommitTags?: string[];

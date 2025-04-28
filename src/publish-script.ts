@@ -20,6 +20,7 @@ export const publishScript = ({
   cleanupCommand,
   packageManager,
   tag,
+  force,
   githubRepoLink,
   otherNames,
   targetPackageJson,
@@ -55,6 +56,10 @@ export const publishScript = ({
 
   if (tag) {
     publishCommand += ` --tag ${tag}`;
+  }
+
+  if (force) {
+    publishCommand += ` --force`;
   }
 
   $(`cd dist && ${publishCommand} && cd ..`, undefined, true);
