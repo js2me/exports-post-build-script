@@ -34,9 +34,9 @@ export const publishScript = ({
   if (commitAllCurrentChanges) {
     $('git add .');
     if (nextVersion == null) {
-      $(`git commit -m "bump: publish last version"`);
+      $(`git commit -m "feat: publish last version"`);
     } else {
-      $(`git commit -m "bump: v${nextVersion}"`);
+      $(`git commit -m "feat: v${nextVersion} version"`);
     }
     $('git push');
   }
