@@ -56,6 +56,11 @@ export interface PostBuildScriptConfig {
 export interface PublishScriptConfig {
   nextVersion: string;
   currVersion: string | null;
+  safe?: boolean;
+  /**
+   * works only with `safe` flag
+   */
+  onAlreadyPublishedThisVersion?: () => void;
   /**
    * Тег для публикации
    */

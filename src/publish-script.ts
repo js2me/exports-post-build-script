@@ -1,7 +1,20 @@
 /* eslint-disable sonarjs/cognitive-complexity */
+import { execSync } from 'node:child_process';
+
 import { PublishScriptConfig } from './types.js';
 import { $ } from './utils/fs.js';
 import { getCommitsFromTagToHead } from './utils/get-commits-from-tag-to-head.js';
+
+const checkExistedVersion = (packageName: string, version: string) => {
+  // eslint-disable-next-line sonarjs/os-command
+  const versionsListJsonString = execSync(
+    `npm view ${packageName} version --json`,
+    { stdio: 'pipe' },
+  ).toString();
+
+  // eslint-disable-next-line sonarjs/os-command
+  return versionsListJsonString.includes(version);
+};
 
 export const publishScript = ({
   nextVersion,
@@ -25,6 +38,8 @@ export const publishScript = ({
   githubRepoLink,
   otherNames,
   targetPackageJson,
+  onAlreadyPublishedThisVersion,
+  safe,
 }: PublishScriptConfig) => {
   if (otherNames?.length && !targetPackageJson) {
     throw new Error(
@@ -64,6 +79,20 @@ export const publishScript = ({
     publishCommand += ` --force`;
   }
 
+  if (safe) {
+    if (!targetPackageJson) {
+      throw new Error('Для правильной работы safe необходим targetPackageJson');
+    }
+    if (
+      checkExistedVersion(
+        targetPackageJson.data.name,
+        targetPackageJson.data.version,
+      )
+    ) {
+      onAlreadyPublishedThisVersion?.();
+      return;
+    }
+  }
   $(`cd dist && ${publishCommand} && cd ..`, undefined, true);
 
   if (createTag && nextVersion != null) {
