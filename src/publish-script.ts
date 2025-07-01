@@ -47,6 +47,21 @@ export const publishScript = ({
     );
   }
 
+  if (safe) {
+    if (!targetPackageJson) {
+      throw new Error('Для правильной работы safe необходим targetPackageJson');
+    }
+    if (
+      checkExistedVersion(
+        targetPackageJson.data.name,
+        targetPackageJson.data.version,
+      )
+    ) {
+      onAlreadyPublishedThisVersion?.();
+      return;
+    }
+  }
+
   if (commitAllCurrentChanges) {
     $('git add .');
     if (nextVersion == null) {
@@ -79,20 +94,6 @@ export const publishScript = ({
     publishCommand += ` --force`;
   }
 
-  if (safe) {
-    if (!targetPackageJson) {
-      throw new Error('Для правильной работы safe необходим targetPackageJson');
-    }
-    if (
-      checkExistedVersion(
-        targetPackageJson.data.name,
-        targetPackageJson.data.version,
-      )
-    ) {
-      onAlreadyPublishedThisVersion?.();
-      return;
-    }
-  }
   $(`cd dist && ${publishCommand} && cd ..`, undefined, true);
 
   if (createTag && nextVersion != null) {
