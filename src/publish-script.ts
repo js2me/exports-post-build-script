@@ -17,6 +17,7 @@ export const publishScript = ({
   ],
   commitAllCurrentChanges,
   createTag,
+  gitTagFormat = 'v<tag>',
   cleanupCommand,
   packageManager,
   tag,
@@ -36,7 +37,8 @@ export const publishScript = ({
     if (nextVersion == null) {
       $(`git commit -m "feat: publish last version"`);
     } else {
-      $(`git commit -m "feat: v${nextVersion} version"`);
+      const nextTagLabel = gitTagFormat.replaceAll('<tag>', nextVersion);
+      $(`git commit -m "feat: ${nextTagLabel} version"`);
     }
     $('git push');
   }
@@ -65,9 +67,11 @@ export const publishScript = ({
   $(`cd dist && ${publishCommand} && cd ..`, undefined, true);
 
   if (createTag && nextVersion != null) {
-    const commits = getCommitsFromTagToHead(
-      currVersion && `v${currVersion}`,
-    ).filter((it) =>
+    const nextTagLabel = gitTagFormat.replaceAll('<tag>', nextVersion);
+    const currTagLabel =
+      currVersion && gitTagFormat.replaceAll('<tag>', currVersion);
+
+    const commits = getCommitsFromTagToHead(currTagLabel).filter((it) =>
       logCommitTags.some((commitTag) => it.startsWith(commitTag)),
     );
 
@@ -75,15 +79,15 @@ export const publishScript = ({
       `## What's Changed`,
       ...commits.map((commit) => `* ${commit}`),
       currVersion
-        ? `**Full Changelog**: ${githubRepoLink}/compare/v${currVersion}...v${nextVersion}`
+        ? `**Full Changelog**: ${githubRepoLink}/compare/${currTagLabel}...${nextTagLabel}`
         : `**Full Changelog**: ${githubRepoLink}/commits/${nextVersion}`,
     ];
 
     const tagMessage = tagMessageLines.join('\n');
 
     try {
-      $(`git tag -a v${nextVersion} -m "${tagMessage}"`);
-      $(`git push origin v${nextVersion}`);
+      $(`git tag -a ${nextTagLabel} -m "${tagMessage}"`);
+      $(`git push origin ${nextTagLabel}`);
     } catch (error) {
       console.error('не удалось сделать и запушить тег', error);
     }

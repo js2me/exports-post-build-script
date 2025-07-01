@@ -65,6 +65,19 @@ export interface PublishScriptConfig {
   commitAllCurrentChanges?: boolean;
   logCommitTags?: string[];
   createTag?: boolean;
+  /**
+   * This value `<tag>` is required in provided string
+   *
+   * Default: `v<tag>`,
+   *
+   * Examples:
+   * ```ts
+   * gitTagFormat: 'v<tag>',
+   * gitTagFormat: '<tag>',
+   * gitTagFormat: '<tag>-foo-bar-baz',
+   * ```
+   */
+  gitTagFormat?: string;
   cleanupCommand?: string;
   githubRepoLink: string;
   otherNames?: string;
