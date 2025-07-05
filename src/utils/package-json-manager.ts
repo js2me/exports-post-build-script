@@ -1,7 +1,28 @@
+import path from 'node:path';
+
 import { readFile, writeFile } from './fs.js';
 
 export class PackageJsonManager {
   data: Record<string, any>;
+
+  get ghRepoData() {
+    const [user, packageName] = this.data.repository.url
+      .split('github.com/')[1]
+      .split('/');
+
+    return {
+      user,
+      packageName,
+    };
+  }
+
+  get locationDir() {
+    return path.resolve(this.path, '../');
+  }
+
+  get repositoryUrl() {
+    return `https://github.com/${this.ghRepoData.user}/${this.ghRepoData.packageName}`;
+  }
 
   constructor(
     private path: string,

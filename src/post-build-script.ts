@@ -181,11 +181,8 @@ export const postBuildScript = ({
         current: versionsDiff.prevVersion,
         next: versionsDiff.nextVersion,
       },
+      targetPackageJson,
       utils,
-      packageJson.data,
-      {
-        targetPackageJson,
-      },
     );
   }
 };

@@ -29,25 +29,21 @@ export const publishScript = ({
   onAlreadyPublishedThisVersion,
   safe,
 }: PublishScriptConfig): boolean => {
-  if (otherNames?.length && !targetPackageJson) {
+  if (!targetPackageJson) {
     throw new Error(
       'Для правильной работы otherNames необходим targetPackageJson - которая будет патчить package.json в dist',
     );
   }
 
-  if (safe) {
-    if (!targetPackageJson) {
-      throw new Error('Для правильной работы safe необходим targetPackageJson');
-    }
-    if (
-      checkExistedVersion(
-        targetPackageJson.data.name,
-        targetPackageJson.data.version,
-      )
-    ) {
-      onAlreadyPublishedThisVersion?.();
-      return false;
-    }
+  if (
+    safe &&
+    checkExistedVersion(
+      targetPackageJson.data.name,
+      targetPackageJson.data.version,
+    )
+  ) {
+    onAlreadyPublishedThisVersion?.();
+    return false;
   }
 
   if (commitAllCurrentChanges) {
@@ -88,8 +84,12 @@ export const publishScript = ({
     const nextTagLabel = gitTagFormat.replaceAll('<tag>', nextVersion);
 
     try {
-      $(`git tag -a ${nextTagLabel}`);
+      $(
+        `git tag -a ${nextTagLabel} -m "[Changelog](${targetPackageJson.repositoryUrl}/blob/master/CHANGELOG.md#${nextTagLabel.replaceAll(/\.|v|\s/g, '')})"`,
+      );
       $(`git push origin ${nextTagLabel}`);
+
+      process.env.PUBLISHED_TAG = nextTagLabel;
     } catch (error) {
       console.error('не удалось сделать и запушить тег', error);
     }

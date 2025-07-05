@@ -43,11 +43,8 @@ export interface PostBuildScriptConfig {
 
   onDone?: (
     versionsDiff: null | { next: string; current: string | null },
+    targetPackageJson: PackageJsonManager,
     utils: FsUtils,
-    packageJson: Record<string, any>,
-    output: {
-      targetPackageJson: PackageJsonManager;
-    },
   ) => void;
 
   updateVersion?: 'minor' | 'major' | 'patch';
