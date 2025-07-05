@@ -55,7 +55,6 @@ export interface PostBuildScriptConfig {
 
 export interface PublishScriptConfig {
   nextVersion: string;
-  currVersion: string | null;
   safe?: boolean;
   /**
    * works only with `safe` flag
@@ -68,7 +67,6 @@ export interface PublishScriptConfig {
   force?: boolean;
   packageManager: 'pnpm' | 'npm';
   commitAllCurrentChanges?: boolean;
-  logCommitTags?: string[];
   createTag?: boolean;
   /**
    * This value `<tag>` is required in provided string
@@ -84,7 +82,6 @@ export interface PublishScriptConfig {
    */
   gitTagFormat?: string;
   cleanupCommand?: string;
-  githubRepoLink: string;
   otherNames?: string;
   targetPackageJson?: PackageJsonManager;
 }

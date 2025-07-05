@@ -3,7 +3,6 @@ import { execSync } from 'node:child_process';
 
 import { PublishScriptConfig } from './types.js';
 import { $ } from './utils/fs.js';
-import { getCommitsFromTagToHead } from './utils/get-commits-from-tag-to-head.js';
 
 const checkExistedVersion = (packageName: string, version: string) => {
   // eslint-disable-next-line sonarjs/os-command
@@ -18,16 +17,6 @@ const checkExistedVersion = (packageName: string, version: string) => {
 
 export const publishScript = ({
   nextVersion,
-  currVersion,
-  logCommitTags = [
-    'feat',
-    'feat',
-    'BREAKING_CHANGE',
-    'fix',
-    'BREAKING CHANGE',
-    'Initial commit',
-    'initial commit',
-  ],
   commitAllCurrentChanges,
   createTag,
   gitTagFormat = 'v<tag>',
@@ -35,12 +24,11 @@ export const publishScript = ({
   packageManager,
   tag,
   force,
-  githubRepoLink,
   otherNames,
   targetPackageJson,
   onAlreadyPublishedThisVersion,
   safe,
-}: PublishScriptConfig) => {
+}: PublishScriptConfig): boolean => {
   if (otherNames?.length && !targetPackageJson) {
     throw new Error(
       'Для правильной работы otherNames необходим targetPackageJson - которая будет патчить package.json в dist',
@@ -58,7 +46,7 @@ export const publishScript = ({
       )
     ) {
       onAlreadyPublishedThisVersion?.();
-      return;
+      return false;
     }
   }
 
@@ -98,25 +86,9 @@ export const publishScript = ({
 
   if (createTag && nextVersion != null) {
     const nextTagLabel = gitTagFormat.replaceAll('<tag>', nextVersion);
-    const currTagLabel =
-      currVersion && gitTagFormat.replaceAll('<tag>', currVersion);
-
-    const commits = getCommitsFromTagToHead(currTagLabel).filter((it) =>
-      logCommitTags.some((commitTag) => it.startsWith(commitTag)),
-    );
-
-    const tagMessageLines: string[] = [
-      `## What's Changed`,
-      ...commits.map((commit) => `* ${commit}`),
-      currVersion
-        ? `**Full Changelog**: ${githubRepoLink}/compare/${currTagLabel}...${nextTagLabel}`
-        : `**Full Changelog**: ${githubRepoLink}/commits/${nextVersion}`,
-    ];
-
-    const tagMessage = tagMessageLines.join('\n');
 
     try {
-      $(`git tag -a ${nextTagLabel} -m "${tagMessage}"`);
+      $(`git tag -a ${nextTagLabel}`);
       $(`git push origin ${nextTagLabel}`);
     } catch (error) {
       console.error('не удалось сделать и запушить тег', error);
@@ -142,4 +114,6 @@ export const publishScript = ({
   if (cleanupCommand) {
     $('npm run clean');
   }
+
+  return true;
 };
