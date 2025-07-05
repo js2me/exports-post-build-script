@@ -15,6 +15,14 @@ const checkExistedVersion = (packageName: string, version: string) => {
   return versionsListJsonString.includes(version);
 };
 
+interface PublishScriptOutput {
+  /**
+   * ТАКЖЕ ЗАПИСЫВАЕТСЯ В ПЕРЕМЕННУЮ ОКРУЖЕНИЯ
+   * PUBLISHED_GIT_TAG
+   */
+  publishedGitTag: null | string;
+}
+
 export const publishScript = ({
   nextVersion,
   commitAllCurrentChanges,
@@ -28,7 +36,9 @@ export const publishScript = ({
   targetPackageJson,
   onAlreadyPublishedThisVersion,
   safe,
-}: PublishScriptConfig): boolean => {
+}: PublishScriptConfig): null | PublishScriptOutput => {
+  let publishedGitTag: null | string = null;
+
   if (!targetPackageJson) {
     throw new Error(
       'Для правильной работы otherNames необходим targetPackageJson - которая будет патчить package.json в dist',
@@ -43,7 +53,7 @@ export const publishScript = ({
     )
   ) {
     onAlreadyPublishedThisVersion?.();
-    return false;
+    return null;
   }
 
   if (commitAllCurrentChanges) {
@@ -89,7 +99,8 @@ export const publishScript = ({
       );
       $(`git push origin ${nextTagLabel}`);
 
-      process.env.PUBLISHED_TAG = nextTagLabel;
+      publishedGitTag = nextTagLabel;
+      process.env.PUBLISHED_GIT_TAG = nextTagLabel;
     } catch (error) {
       console.error('не удалось сделать и запушить тег', error);
     }
@@ -115,5 +126,7 @@ export const publishScript = ({
     $('npm run clean');
   }
 
-  return true;
+  return {
+    publishedGitTag,
+  };
 };
