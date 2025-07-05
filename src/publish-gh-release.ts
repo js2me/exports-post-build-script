@@ -4,8 +4,6 @@ import ghRelease from 'gh-release/index.js';
 
 interface PublishGhReleaseConfig {
   version: string;
-  tag_name: string;
-  name: string;
   body: string;
   draft?: boolean;
   prerelease?: boolean;
