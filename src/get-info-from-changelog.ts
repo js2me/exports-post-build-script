@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 export const getInfoFromChangelog = (
   version: string,
   pathToChangelog: string,
+  repoUrl: string,
 ) => {
   const changelogContent = readFileSync(pathToChangelog, {
     encoding: 'utf8',
@@ -23,6 +24,14 @@ export const getInfoFromChangelog = (
     .split('###')
     .slice(1)
     .map((str) => `###${str}`);
+
+  if (prevVersion) {
+    whatChangesLines.push(
+      `Changes: ${repoUrl}/compare/${prevVersion}...${version}`,
+    );
+  } else {
+    whatChangesLines.push(`Changes: ${repoUrl}/compare/...${version}`);
+  }
 
   const whatChangesText = whatChangesLines.join('\n');
 
