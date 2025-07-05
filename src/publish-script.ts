@@ -95,7 +95,7 @@ export const publishScript = ({
 
     try {
       $(
-        `git tag -a ${nextTagLabel} -m "[Changelog](${targetPackageJson.repositoryUrl}/blob/master/CHANGELOG.md#${nextTagLabel.replaceAll(/\.|v|\s/g, '')})"`,
+        `git tag -a ${nextTagLabel} -m "${targetPackageJson.repositoryUrl}/blob/master/CHANGELOG.md#${nextTagLabel.replaceAll(/\.|v|\s/g, '')}"`,
       );
       $(`git push origin ${nextTagLabel}`);
 
