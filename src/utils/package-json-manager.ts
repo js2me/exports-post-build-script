@@ -29,6 +29,12 @@ export class PackageJsonManager {
     data?: Record<string, any>,
   ) {
     this.data = data || JSON.parse(readFile(path).toString());
+
+    if (!this.data.repository) {
+      throw new Error(
+        'Поле repository обязателен для работы скрипта, нужно его указать',
+      );
+    }
   }
 
   syncWithFs() {

@@ -23,6 +23,10 @@
   "dependencies": {
     "simple-git": "3.27.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/js2me/exports-post-build-script"
+  },
   "devDependencies": {
     "@types/node": "22.7.4",
     "eslint": "8.57.0",
