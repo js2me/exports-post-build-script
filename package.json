@@ -21,6 +21,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "gh-release": "^7.0.2",
     "simple-git": "3.27.0"
   },
   "repository": {
