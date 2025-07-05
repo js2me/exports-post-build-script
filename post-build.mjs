@@ -15,7 +15,6 @@ postBuildScript({
         packageManager: 'pnpm',
         commitAllCurrentChanges: true,
         createTag: true,
-        githubRepoLink: 'https://github.com/js2me/exports-post-build-script',
         cleanupCommand: 'npm run clean',
       });
     }
