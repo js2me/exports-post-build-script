@@ -5,14 +5,28 @@ import { PublishScriptConfig } from './types.js';
 import { $ } from './utils/fs.js';
 
 const checkExistedVersion = (packageName: string, version: string) => {
-  // eslint-disable-next-line sonarjs/os-command
-  const versionsListJsonString = execSync(
-    `npm view ${packageName} version --json`,
-    { stdio: 'pipe' },
-  ).toString();
+  try {
+    // eslint-disable-next-line sonarjs/os-command
+    const versionsListJsonString = execSync(
+      `npm view ${packageName} version --json`,
+      { stdio: 'pipe' },
+    ).toString();
 
-  // eslint-disable-next-line sonarjs/os-command
-  return versionsListJsonString.includes(version);
+    // eslint-disable-next-line sonarjs/os-command
+    return versionsListJsonString.includes(version);
+  } catch (error) {
+    if (
+      error &&
+      typeof error == 'object' &&
+      (error as any).message?.includes(
+        `404 Not Found - GET https://registry.npmjs.org/${packageName} - Not found`,
+      )
+    ) {
+      console.warn(`Пакет "${packageName}" не найден в регистри`);
+      return false;
+    }
+    throw error;
+  }
 };
 
 interface PublishScriptOutput {
