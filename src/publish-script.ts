@@ -50,6 +50,7 @@ export const publishScript = ({
   targetPackageJson,
   onAlreadyPublishedThisVersion,
   safe,
+  mainBranch = 'main',
 }: PublishScriptConfig): null | PublishScriptOutput => {
   let publishedGitTag: null | string = null;
 
@@ -109,7 +110,7 @@ export const publishScript = ({
 
     try {
       $(
-        `git tag -a ${nextTagLabel} -m "[Changelog](${targetPackageJson.repositoryUrl}/blob/master/CHANGELOG.md#${nextTagLabel.replaceAll(/\.|v|\s/g, '')})"`,
+        `git tag -a ${nextTagLabel} -m "[Changelog](${targetPackageJson.repositoryUrl}/blob/${mainBranch}/CHANGELOG.md#${nextTagLabel.replaceAll(/\.|v|\s/g, '')})"`,
       );
       $(`git push origin ${nextTagLabel}`);
 

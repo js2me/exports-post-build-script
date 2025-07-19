@@ -54,6 +54,10 @@ export interface PublishScriptConfig {
   nextVersion: string;
   safe?: boolean;
   /**
+   * @default - `main`
+   */
+  mainBranch?: string;
+  /**
    * works only with `safe` flag
    */
   onAlreadyPublishedThisVersion?: () => void;
