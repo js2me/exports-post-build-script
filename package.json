@@ -1,6 +1,6 @@
 {
   "name": "js2me-exports-post-build-script",
-  "version": "4.1.6",
+  "version": "5.0.0",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
