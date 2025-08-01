@@ -77,7 +77,7 @@ export const publishScript = ({
       $(`git commit -m "feat: publish last version"`);
     } else {
       const nextTagLabel = gitTagFormat.replaceAll('<tag>', nextVersion);
-      $(`git commit -m "feat: ${nextTagLabel} version"`);
+      $(`git commit -m "feat: publish ${nextTagLabel} version"`);
     }
     $('git push');
   }
