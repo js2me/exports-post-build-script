@@ -13,7 +13,14 @@ export const getInfoFromChangelog = (
 
   const currentVersionContentLines = contentLines.find((line) =>
     line.startsWith(version.replace('v', '')),
-  )!;
+  );
+
+  if (!currentVersionContentLines) {
+    return {
+      prevVersion: null,
+      whatChangesText: '',
+    };
+  }
 
   const prevVersion =
     contentLines[contentLines.indexOf(currentVersionContentLines) + 1]?.split(
