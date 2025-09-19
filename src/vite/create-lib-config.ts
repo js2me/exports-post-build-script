@@ -8,7 +8,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export const createViteLibConfig = ({
   entry = 'src/index.ts',
   entryRoot = 'src',
-  fileName,
+  fileName = 'index',
 }: {
   entry?: string;
   entryRoot?: string;
