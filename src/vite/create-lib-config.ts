@@ -9,13 +9,17 @@ export const createViteLibConfig = ({
   entry = 'src/index.ts',
   entryRoot = 'src',
   fileName = 'index',
+  outDir = 'dist',
 }: {
   entry?: string;
   entryRoot?: string;
   fileName?: string;
+  outDir?: string;
 }): UserConfig & { test: Record<string, any> } => {
   const packageJsonStr = readFileSync('package.json', 'utf-8');
   const packageJson = JSON.parse(packageJsonStr);
+
+  const targetOutDir = outDir;
 
   return {
     ...defineConfig({
@@ -26,13 +30,13 @@ export const createViteLibConfig = ({
           tsconfigPath: 'tsconfig.json',
           rollupTypes: true,
           async afterBuild() {
-            const files = await readdir('dist');
+            const files = await readdir(targetOutDir);
             const dtsFiles = files.filter((file) => file.endsWith('.d.ts'));
             await Promise.all(
               dtsFiles.map((file) =>
                 copyFile(
-                  path.join('dist', file),
-                  path.join('dist', file.replace('.d.ts', '.d.cts')),
+                  path.join(targetOutDir, file),
+                  path.join(targetOutDir, file.replace('.d.ts', '.d.cts')),
                 ),
               ),
             );
@@ -40,6 +44,7 @@ export const createViteLibConfig = ({
         }),
       ],
       build: {
+        outDir: targetOutDir,
         lib: {
           entry,
           name: packageJson.name,
