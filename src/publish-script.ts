@@ -52,6 +52,7 @@ export const publishScript = ({
   safe,
   mainBranch = 'main',
   stayInCurrentDir,
+  test,
 }: PublishScriptConfig): null | PublishScriptOutput => {
   let publishedGitTag: null | string = null;
 
@@ -73,14 +74,26 @@ export const publishScript = ({
   }
 
   if (commitAllCurrentChanges) {
-    $('git add .');
+    $('git add .', undefined, false, undefined, test);
     if (nextVersion == null) {
-      $(`git commit -m "feat: publish last version"`);
+      $(
+        `git commit -m "feat: publish last version"`,
+        undefined,
+        false,
+        undefined,
+        test,
+      );
     } else {
       const nextTagLabel = gitTagFormat.replaceAll('<tag>', nextVersion);
-      $(`git commit -m "feat: publish ${nextTagLabel} version"`);
+      $(
+        `git commit -m "feat: publish ${nextTagLabel} version"`,
+        undefined,
+        false,
+        undefined,
+        test,
+      );
     }
-    $('git push');
+    $('git push', undefined, false, undefined, test);
   }
 
   let publishCommand: string;
@@ -105,9 +118,15 @@ export const publishScript = ({
   }
 
   if (stayInCurrentDir) {
-    $(publishCommand, undefined, true);
+    $(publishCommand, undefined, true, undefined, test);
   } else {
-    $(`cd dist && ${publishCommand} && cd ..`, undefined, true);
+    $(
+      `cd dist && ${publishCommand} && cd ..`,
+      undefined,
+      true,
+      undefined,
+      test,
+    );
   }
 
   if (createTag && nextVersion != null) {
@@ -116,8 +135,18 @@ export const publishScript = ({
     try {
       $(
         `git tag -a ${nextTagLabel} -m "[Changelog](${targetPackageJson.repositoryUrl}/blob/${mainBranch}/CHANGELOG.md#${nextTagLabel.replaceAll(/\.|v|\s/g, '')})"`,
+        undefined,
+        undefined,
+        undefined,
+        test,
       );
-      $(`git push origin ${nextTagLabel}`);
+      $(
+        `git push origin ${nextTagLabel}`,
+        undefined,
+        undefined,
+        undefined,
+        test,
+      );
 
       publishedGitTag = nextTagLabel;
       process.env.PUBLISHED_GIT_TAG = nextTagLabel;
@@ -147,7 +176,7 @@ export const publishScript = ({
   }
 
   if (cleanupCommand) {
-    $('npm run clean');
+    $('npm run clean', undefined, undefined, undefined, test);
   }
 
   return {

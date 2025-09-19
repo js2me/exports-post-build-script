@@ -7,10 +7,16 @@ export const $ = (
   stdio: StdioOptions = 'inherit',
   throwOnError?: boolean,
   onError?: () => void,
+  test?: boolean,
 ) => {
   try {
-    // eslint-disable-next-line sonarjs/os-command
-    return cp.execSync(cmd, { stdio, shell: '/bin/sh' })?.toString();
+    if (test) {
+      console.log(`test command exec: ${cmd}`);
+      return '';
+    } else {
+      // eslint-disable-next-line sonarjs/os-command
+      return cp.execSync(cmd, { stdio, shell: '/bin/sh' })?.toString();
+    }
   } catch (error) {
     console.error(`Не удалось выполнить команду - ${cmd}`, error);
     onError?.();

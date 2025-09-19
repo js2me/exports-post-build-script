@@ -67,6 +67,7 @@ export interface PublishScriptConfig {
    */
   tag?: string;
   force?: boolean;
+  test?: boolean;
   packageManager: 'pnpm' | 'npm';
   commitAllCurrentChanges?: boolean;
   createTag?: boolean;
