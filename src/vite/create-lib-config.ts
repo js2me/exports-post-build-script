@@ -47,7 +47,10 @@ export const createViteLibConfig = ({
           formats: ['es', 'cjs'],
         },
         rollupOptions: {
-          external: packageJson.peerDependencies ?? [],
+          external: [
+            ...Object.keys(packageJson.peerDependencies ?? {}),
+            ...Object.keys(packageJson.dependencies ?? {}),
+          ],
         },
       },
     }),
