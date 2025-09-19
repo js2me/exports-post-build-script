@@ -1,5 +1,5 @@
-import * as fsUtils from './utils/fs.js';
-import { PackageJsonManager } from './utils/package-json-manager.js';
+import type * as fsUtils from './utils/fs.js';
+import type { PackageJsonManager } from './utils/package-json-manager.js';
 
 export type FsUtils = typeof fsUtils;
 

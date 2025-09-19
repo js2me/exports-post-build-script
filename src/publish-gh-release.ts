@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-ignore
+// @ts-expect-error
 import ghRelease from 'gh-release/index.js';
 
 interface PublishGhReleaseConfig {

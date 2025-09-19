@@ -6,7 +6,8 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "check": "eslint . --fix",
+    "lint:check": "pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true",
+    "check": "pnpm lint:check",
     "prebuild": "npm run clean && npm run check",
     "build": "tsc && node ./post-build.mjs",
     "pub": "PUBLISH=true pnpm run build",
@@ -22,16 +23,19 @@
   "license": "MIT",
   "dependencies": {
     "gh-release": "^7.0.2",
-    "simple-git": "3.27.0"
+    "simple-git": "3.27.0",
+    "vite": "^7.1.6",
+    "vite-plugin-dts": "^4.5.4",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/js2me/exports-post-build-script"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
     "@types/node": "22.7.4",
-    "eslint": "8.57.0",
-    "js2me-eslint-config": "1.0.4",
+    "js2me-biome-config": "^1.0.5",
     "rimraf": "6.0.1",
     "typescript": "5.4.5"
   },

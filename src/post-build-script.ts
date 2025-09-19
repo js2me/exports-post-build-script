@@ -1,4 +1,7 @@
-import { FilterExportsPathFunction, PostBuildScriptConfig } from './types.js';
+import type {
+  FilterExportsPathFunction,
+  PostBuildScriptConfig,
+} from './types.js';
 import * as utils from './utils/fs.js';
 import { getPackageVersionDiff } from './utils/get-package-version-diff.js';
 import { PackageJsonManager } from './utils/package-json-manager.js';

@@ -8,19 +8,15 @@ export const updatePackageVersion = (
 
   switch (target) {
     case 'major': {
-      {
-        major = String(Number(major) + 1);
-        minor = '0';
-        patch = '0';
-        break;
-      }
+      major = String(Number(major) + 1);
+      minor = '0';
+      patch = '0';
+      break;
     }
     case 'minor': {
-      {
-        minor = String(Number(minor) + 1);
-        patch = '0';
-        break;
-      }
+      minor = String(Number(minor) + 1);
+      patch = '0';
+      break;
     }
     default: {
       patch = String(Number(patch) + 1);

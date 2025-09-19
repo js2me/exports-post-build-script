@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { execSync } from 'node:child_process';
 
-import { PublishScriptConfig } from './types.js';
+import type { PublishScriptConfig } from './types.js';
 import { $ } from './utils/fs.js';
 
 const checkExistedVersion = (packageName: string, version: string) => {
@@ -17,7 +17,7 @@ const checkExistedVersion = (packageName: string, version: string) => {
   } catch (error) {
     if (
       error &&
-      typeof error == 'object' &&
+      typeof error === 'object' &&
       (error as any).message?.includes(
         `404 Not Found - GET https://registry.npmjs.org/${packageName} - Not found`,
       )
