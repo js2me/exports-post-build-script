@@ -51,6 +51,7 @@ export const publishScript = ({
   onAlreadyPublishedThisVersion,
   safe,
   mainBranch = 'main',
+  stayInCurrentDir,
 }: PublishScriptConfig): null | PublishScriptOutput => {
   let publishedGitTag: null | string = null;
 
@@ -103,7 +104,11 @@ export const publishScript = ({
     publishCommand += ` --force`;
   }
 
-  $(`cd dist && ${publishCommand} && cd ..`, undefined, true);
+  if (stayInCurrentDir) {
+    $(publishCommand, undefined, true);
+  } else {
+    $(`cd dist && ${publishCommand} && cd ..`, undefined, true);
+  }
 
   if (createTag && nextVersion != null) {
     const nextTagLabel = gitTagFormat.replaceAll('<tag>', nextVersion);
@@ -129,7 +134,11 @@ export const publishScript = ({
         name: otherName,
       });
 
-      $(`cd dist && ${publishCommand} && cd ..`);
+      if (stayInCurrentDir) {
+        $(publishCommand);
+      } else {
+        $(`cd dist && ${publishCommand} && cd ..`);
+      }
     }
 
     targetPackageJson.update({
