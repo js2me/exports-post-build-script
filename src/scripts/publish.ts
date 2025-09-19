@@ -28,7 +28,7 @@ const publishOutput = publishScript({
   onAlreadyPublishedThisVersion: () => {
     console.warn(`${pckgJson.data.version} already published`);
   },
-  cleanupCommand: 'pnpm clean',
+  cleanupCommand: `pnpm ${options.cleanupCommand ?? 'clean'}`,
   targetPackageJson: pckgJson,
   mainBranch: options.branch ?? 'master',
   stayInCurrentDir: true,
