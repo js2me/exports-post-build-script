@@ -101,12 +101,13 @@ export const postBuildScript = ({
   });
 
   const exportsMap: Record<string, any> = {
-    ...buildExportsMap(
-      srcDirName,
-      {},
-      srcDirName,
-      filterExportsPathFn || defaultFilterExportsPathFunction,
-    )!,
+    ...(packageJson.data.exports ??
+      buildExportsMap(
+        srcDirName,
+        {},
+        srcDirName,
+        filterExportsPathFn || defaultFilterExportsPathFunction,
+      )!),
     './package.json': './package.json',
   };
 
@@ -115,13 +116,16 @@ export const postBuildScript = ({
   const targetPackageJson = new PackageJsonManager(`${buildDir}/package.json`, {
     ...packageJson.data,
     exports: exportsMap,
-    files: ['*'],
+    files: packageJson.data.files ?? ['*'],
   });
 
   if (rootExport) {
-    if (typeof rootExport === 'string') {
+    if (typeof rootExport === 'string' && !targetPackageJson.data.main) {
       targetPackageJson.data.main = rootExport;
-    } else {
+    } else if (
+      !targetPackageJson.data.main &&
+      !targetPackageJson.data.typings
+    ) {
       targetPackageJson.data.main = rootExport.import;
       targetPackageJson.data.typings = rootExport.types;
     }
