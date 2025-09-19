@@ -53,7 +53,7 @@ export interface PostBuildScriptConfig {
 export interface PublishScriptConfig {
   nextVersion: string;
   safe?: boolean;
-  stayInCurrentDir?: boolean
+  stayInCurrentDir?: boolean;
   /**
    * @default - `main`
    */
