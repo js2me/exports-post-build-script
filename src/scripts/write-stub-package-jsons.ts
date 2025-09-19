@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
-import { readdirSync, statSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, statSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const STUB_PACKAGE_JSON_CONTENT = `{ 
   "type": "module",
@@ -14,7 +14,7 @@ const STUB_PACKAGE_JSON_CONTENT = `{
 /**
  * Recursively find all index.d.cts files in a directory
  */
-function findIndexJsFiles(dir: string, relativePath = ""): string[] {
+function findIndexJsFiles(dir: string, relativePath = ''): string[] {
   const results: string[] = [];
 
   try {
@@ -22,9 +22,11 @@ function findIndexJsFiles(dir: string, relativePath = ""): string[] {
 
     for (const entry of entries) {
       // Skip node_modules
-      if (entry !== "node_modules") {
+      if (entry !== 'node_modules') {
         const fullPath = join(dir, entry);
-        const relativeFilePath = relativePath ? join(relativePath, entry) : entry;
+        const relativeFilePath = relativePath
+          ? join(relativePath, entry)
+          : entry;
 
         try {
           const stat = statSync(fullPath);
@@ -32,9 +34,9 @@ function findIndexJsFiles(dir: string, relativePath = ""): string[] {
           if (stat.isDirectory()) {
             // Recursively search subdirectories
             results.push(...findIndexJsFiles(fullPath, relativeFilePath));
-          } else if (entry === "index.d.cts") {
+          } else if (entry === 'index.d.cts') {
             // Found an index.d.cts file
-            results.push(relativePath || ".");
+            results.push(relativePath || '.');
           }
         } catch {
           // Skip files/directories we can't access
@@ -53,7 +55,7 @@ function findIndexJsFiles(dir: string, relativePath = ""): string[] {
  * This resolves TypeScript assignability issues by providing explicit type declarations.
  */
 function writeStubPackageJsons() {
-  const zodPackageRoot = join(import.meta.dirname, "../packages/zod");
+  const zodPackageRoot = join(import.meta.dirname, '../packages/zod');
 
   // Find all directories containing index.d.cts files
   const dirsWithIndexJs = findIndexJsFiles(zodPackageRoot);
@@ -62,7 +64,7 @@ function writeStubPackageJsons() {
 
   for (const dir of dirsWithIndexJs) {
     // Skip root directory (it already has a proper package.json)
-    if (dir === ".") {
+    if (dir === '.') {
       continue;
     }
 
@@ -72,14 +74,14 @@ function writeStubPackageJsons() {
     }
     processedDirs.add(dir);
 
-    const packageJsonPath = join(zodPackageRoot, dir, "package.json");
+    const packageJsonPath = join(zodPackageRoot, dir, 'package.json');
 
     // Write the stub package.json
-    writeFileSync(packageJsonPath, STUB_PACKAGE_JSON_CONTENT, "utf8");
+    writeFileSync(packageJsonPath, STUB_PACKAGE_JSON_CONTENT, 'utf8');
     console.log(`✅ Created ${dir}/package.json`);
   }
 
-  console.log("\n✨ Done! All stub package.json files have been created.");
+  console.log('\n✨ Done! All stub package.json files have been created.');
 }
 
 // Run the script
