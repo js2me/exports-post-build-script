@@ -32,6 +32,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
     "@types/node": "22.7.4",
+    "cac": "^6.7.14",
     "js2me-biome-config": "^1.0.5",
     "rimraf": "6.0.1",
     "typescript": "5.4.5"
