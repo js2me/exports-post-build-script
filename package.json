@@ -23,10 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "gh-release": "^7.0.2",
-    "simple-git": "3.27.0",
-    "vite": "^7.1.6",
-    "vite-plugin-dts": "^4.5.4",
-    "vite-tsconfig-paths": "^5.1.4"
+    "simple-git": "3.27.0"
   },
   "repository": {
     "type": "git",
