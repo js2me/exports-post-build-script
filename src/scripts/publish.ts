@@ -31,7 +31,7 @@ const publishOutput = publishScript({
   cleanupCommand: `pnpm ${options.cleanupCommand ?? 'clean'}`,
   targetPackageJson: pckgJson,
   mainBranch: options.branch ?? 'master',
-  stayInCurrentDir: true,
+  stayInCurrentDir: 'openDistDir' in options ? false : true,
 });
 
 if (process.env.CI) {
