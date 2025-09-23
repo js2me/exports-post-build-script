@@ -1,6 +1,6 @@
 {
-  "name": "js2me-exports-post-build-script",
-  "version": "5.7.1",
+  "name": "sborshik",
+  "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -29,6 +29,7 @@
     "type": "git",
     "url": "git://github.com/js2me/exports-post-build-script"
   },
+  "bin": "./cli/index.js",
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
     "@types/node": "22.7.4",
