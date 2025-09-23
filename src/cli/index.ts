@@ -80,6 +80,14 @@ cli
 
       if (pckgJson.data.bin) {
         pckgJson.data.bin = removeDistFromExport(pckgJson.data.bin);
+
+        if (pckgJson.data.type === 'module') {
+          if (pckgJson.data.bin.endsWith('.cjs')) {
+            pckgJson.data.bin = `${pckgJson.data.bin.slice(0, -3)}js`;
+          }
+        } else if (pckgJson.data.bin.endsWith('.js')) {
+          pckgJson.data.bin = `${pckgJson.data.bin.slice(0, -2)}cjs`;
+        }
       }
 
       if (pckgJson.data.exports) {
