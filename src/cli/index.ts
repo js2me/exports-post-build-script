@@ -25,7 +25,7 @@ cli
     });
 
     const pckgJson = new PackageJsonManager(
-      path.join(process.cwd(), './package.json'),
+      path.join(process.cwd(), './dist/package.json'),
     );
 
     if (pckgJson.data.zshy) {
