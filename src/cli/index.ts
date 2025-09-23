@@ -12,11 +12,18 @@ import { PackageJsonManager } from '../utils/package-json-manager.js';
 const cli = cac('sborshik');
 
 cli
-  .command(
-    'fill-dist',
+  .command('build', 'Build project using "zshy"')
+  .option(
+    '--fillDist',
     'Fill dist directory (copies package.json, README.md, LICENSE, assets)',
   )
-  .action(() => {
+  .action(({ fillDist }) => {
+    $('pnpm exec zshy');
+
+    if (!fillDist) {
+      return;
+    }
+
     postBuildScript({
       buildDir: 'dist',
       rootDir: '.',
@@ -83,7 +90,7 @@ cli
 
 cli
   .command('publish')
-  .option('--openDistDir', 'Make publish from dist directory')
+  .option('--useDistDir', 'Make publish from dist directory')
   .option(
     '--cleanupCommand <cleanupCommand>',
     'Name of the Cleanup command (pnpm run <cleanupCommand>)',
@@ -110,7 +117,7 @@ cli
       cleanupCommand: `pnpm ${options.cleanupCommand ?? 'clean'}`,
       targetPackageJson: pckgJson,
       mainBranch: options.branch ?? 'master',
-      stayInCurrentDir: 'openDistDir' in options ? false : true,
+      stayInCurrentDir: 'useDistDir' in options ? false : true,
     });
 
     if (process.env.CI) {
