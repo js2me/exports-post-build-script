@@ -23,6 +23,39 @@ cli
       srcDirName: 'src',
       filesToCopy: ['LICENSE', 'README.md', 'assets'],
     });
+
+    const pckgJson = new PackageJsonManager(
+      path.join(process.cwd(), './package.json'),
+    );
+
+    if (pckgJson.data.zshy) {
+      delete pckgJson.data.zshy;
+
+      pckgJson.data.files = ['*'];
+
+      if (pckgJson.data.exports) {
+        const fixExport = (
+          value: Record<string, any> | string,
+        ): string | Record<string, any> => {
+          if (typeof value === 'string') {
+            return value.replace('./dist/', './');
+          } else {
+            return Object.fromEntries(
+              Object.entries(value).map(([key, value]) => [
+                key,
+                fixExport(value),
+              ]),
+            );
+          }
+        };
+
+        Object.entries(pckgJson.data.exports).forEach(([key, value]) => {
+          pckgJson.data.exports[key] = fixExport(value as any);
+        });
+      }
+
+      pckgJson.syncWithFs();
+    }
   });
 
 cli
