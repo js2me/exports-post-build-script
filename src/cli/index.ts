@@ -31,6 +31,14 @@ cli
     if (pckgJson.data.zshy) {
       delete pckgJson.data.zshy;
 
+      const sourcePckgJson = new PackageJsonManager(
+        path.join(process.cwd(), './package.json'),
+      );
+
+      delete sourcePckgJson.data.files;
+      delete sourcePckgJson.data.exports;
+
+      pckgJson.data.files = ['*'];
       pckgJson.data.files = ['*'];
 
       if (pckgJson.data.exports) {
@@ -55,6 +63,7 @@ cli
       }
 
       pckgJson.syncWithFs();
+      sourcePckgJson.syncWithFs();
     }
   });
 
