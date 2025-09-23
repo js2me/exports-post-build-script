@@ -77,6 +77,10 @@ cli
         pckgJson.data.types = removeDistFromExport(pckgJson.data.types);
       }
 
+      if (pckgJson.data.bin) {
+        pckgJson.data.bin = removeDistFromExport(pckgJson.data.bin);
+      }
+
       if (pckgJson.data.exports) {
         Object.entries(pckgJson.data.exports).forEach(([key, value]) => {
           pckgJson.data.exports[key] = removeDistFromExport(value as any);
