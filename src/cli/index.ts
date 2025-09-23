@@ -42,26 +42,37 @@ cli
       delete sourcePckgJson.data.types;
 
       pckgJson.data.files = ['*'];
-      pckgJson.data.files = ['*'];
+
+      const removeDistFromExport = (
+        value: Record<string, any> | string,
+      ): string | Record<string, any> => {
+        if (typeof value === 'string') {
+          return value.replace('./dist/', './');
+        } else {
+          return Object.fromEntries(
+            Object.entries(value).map(([key, value]) => [
+              key,
+              removeDistFromExport(value),
+            ]),
+          );
+        }
+      };
+
+      if (pckgJson.data.main) {
+        pckgJson.data.main = removeDistFromExport(pckgJson.data.main);
+      }
+
+      if (pckgJson.data.module) {
+        pckgJson.data.module = removeDistFromExport(pckgJson.data.module);
+      }
+
+      if (pckgJson.data.types) {
+        pckgJson.data.types = removeDistFromExport(pckgJson.data.types);
+      }
 
       if (pckgJson.data.exports) {
-        const fixExport = (
-          value: Record<string, any> | string,
-        ): string | Record<string, any> => {
-          if (typeof value === 'string') {
-            return value.replace('./dist/', './');
-          } else {
-            return Object.fromEntries(
-              Object.entries(value).map(([key, value]) => [
-                key,
-                fixExport(value),
-              ]),
-            );
-          }
-        };
-
         Object.entries(pckgJson.data.exports).forEach(([key, value]) => {
-          pckgJson.data.exports[key] = fixExport(value as any);
+          pckgJson.data.exports[key] = removeDistFromExport(value as any);
         });
       }
 
