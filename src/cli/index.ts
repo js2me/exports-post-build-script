@@ -37,6 +37,9 @@ cli
 
       delete sourcePckgJson.data.files;
       delete sourcePckgJson.data.exports;
+      delete sourcePckgJson.data.main;
+      delete sourcePckgJson.data.module;
+      delete sourcePckgJson.data.types;
 
       pckgJson.data.files = ['*'];
       pckgJson.data.files = ['*'];
