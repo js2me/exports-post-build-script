@@ -21,7 +21,7 @@ cli
       buildDir: 'dist',
       rootDir: '.',
       srcDirName: 'src',
-      filesToCopy: ['LICENSE', 'README.md', 'assets'],
+      filesToCopy: ['LICENSE', 'README.md'],
     });
 
     const pckgJson = new PackageJsonManager(
