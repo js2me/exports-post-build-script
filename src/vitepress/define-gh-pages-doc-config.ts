@@ -93,7 +93,7 @@ export const defineGhPagesDocConfig = (
     lastUpdated: true,
     sitemap: {
       hostname: `https://${pckgJson.author}.github.io/${pckgJson.name}`,
-      lastmodDateOnly: false
+      lastmodDateOnly: false,
     },
     head: [
       ['link', { rel: 'icon', href: `/${pckgJson.name}/logo.png` }],
