@@ -106,7 +106,9 @@ export const defineGhPagesDocConfig = (
       },
       ...config.themeConfig,
       footer: {
-        message: `Released under the ${pckgJson.version} License.`,
+        message: pckgJson.license
+          ? `Released under the ${pckgJson.license} License.`
+          : 'No license',
         copyright: `Copyright © ${config.createdYear || '2025'}-PRESENT ${pckgJson.author}`,
         ...config.themeConfig?.footer,
       },
