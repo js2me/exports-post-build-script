@@ -7,7 +7,7 @@ postBuildScript({
   filesToCopy: ['LICENSE', 'README.md'],
   updateVersion: process.env.PUBLISH_VERSION,
   onDone: (versionsDiff, targetPackageJson, { $ }) => {
-    $('cp -r src/vitepress dist/vitepress');
+    $('cp -r src/vitepress/* dist/vitepress');
 
     if (process.env.PUBLISH) {
       publishScript({
