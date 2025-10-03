@@ -90,6 +90,11 @@ export const defineGhPagesDocConfig = (
       return minify(htmlDoc.outerHTML);
     },
     base: `/${pckgJson.name}/`,
+    lastUpdated: true,
+    sitemap: {
+      hostname: `https://${pckgJson.author}.github.io/${pckgJson.name}`,
+      lastmodDateOnly: false
+    },
     head: [
       ['link', { rel: 'icon', href: `/${pckgJson.name}/logo.png` }],
       ...(config.head || []),
