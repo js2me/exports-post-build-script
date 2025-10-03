@@ -1,11 +1,14 @@
 import { minify } from 'htmlfy';
 
 import jsdom from 'jsdom';
-import { defineConfig, type UserConfig } from 'vitepress';
+import { type DefaultTheme, defineConfig, type UserConfig } from 'vitepress';
 
 export const defineGhPagesDocConfig = (
   pckgJson: any,
-  config: Omit<UserConfig, 'transformHtml' | 'title' | 'base'>,
+  config: Omit<
+    UserConfig<DefaultTheme.Config>,
+    'transformHtml' | 'title' | 'base'
+  > & { createdYear: string },
 ) => {
   return defineConfig({
     ...config,
@@ -91,5 +94,24 @@ export const defineGhPagesDocConfig = (
       ['link', { rel: 'icon', href: `/${pckgJson.name}/logo.png` }],
       ...(config.head || []),
     ],
+    themeConfig: {
+      logo: '/logo.png',
+      search: {
+        provider: 'local',
+      },
+      ...config.themeConfig,
+      footer: {
+        message: `Released under the ${pckgJson.version} License.`,
+        copyright: `Copyright © ${config.createdYear || '2025'}-PRESENT ${pckgJson.author}`,
+        ...config.themeConfig?.footer,
+      },
+      socialLinks: [
+        {
+          icon: 'github',
+          link: `https://github.com/${pckgJson.author}/${pckgJson.name}`,
+        },
+        ...(config.themeConfig?.socialLinks || []),
+      ],
+    },
   });
 };
