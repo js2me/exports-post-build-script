@@ -11,11 +11,16 @@ import { PackageJsonManager } from '../utils/package-json-manager.js';
 
 const cli = cac('sborshik');
 
-const fillDistAction = () => {
+const fillDistAction = ({
+  useBuildDirForExportsMap,
+}: {
+  useBuildDirForExportsMap?: boolean;
+}) => {
   postBuildScript({
     buildDir: 'dist',
     rootDir: '.',
     srcDirName: 'src',
+    useBuildDirForExportsMap: useBuildDirForExportsMap,
     filesToCopy: ['LICENSE', 'README.md'],
   });
 
@@ -95,8 +100,9 @@ cli
     '--fillDist',
     'Fill dist directory (copies package.json, README.md, LICENSE, assets)',
   )
+  .option('--useBuildDirForExportsMap', '')
   .option('--useTsc', 'Use just tsc')
-  .action(({ fillDist, useTsc }) => {
+  .action(({ fillDist, useTsc, useBuildDirForExportsMap }) => {
     if (useTsc) {
       $('pnpm exec tsc');
     } else {
@@ -107,12 +113,15 @@ cli
       return;
     }
 
-    fillDistAction();
+    fillDistAction({ useBuildDirForExportsMap });
   });
 
-cli.command('fill-dist').action(() => {
-  fillDistAction();
-});
+cli
+  .command('fill-dist')
+  .option('--useBuildDirForExportsMap', '')
+  .action(({ useBuildDirForExportsMap }) => {
+    fillDistAction({ useBuildDirForExportsMap });
+  });
 
 cli
   .command('publish')

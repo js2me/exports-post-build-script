@@ -52,26 +52,32 @@ const buildExportsMap = (
       // Обработка файла index
       if (fixedPath === 'index') {
         exportsMap[`.`] = {
-          import: `./${fixedPath}.${jsExtension}`,
-          default: `./${fixedPath}.${jsExtension}`,
-          types: `./${fixedPath}.d.${tsExtension}`,
+          import: `./${fixedPath}${jsExtension}`,
+          default: `./${fixedPath}${jsExtension}`,
+          types: `./${fixedPath}.d${tsExtension}`,
         };
         // Обработка других файлов с индексом в конце пути
       } else if (fixedPath.endsWith('/index')) {
         exportsMap[`./${fixedPath.split('/').slice(0, -1).join('/')}`] = {
-          import: `./${fixedPath}.${jsExtension}`,
-          default: `./${fixedPath}.${jsExtension}`,
-          types: `./${fixedPath}.d.${tsExtension}`,
+          import: `./${fixedPath}${jsExtension}`,
+          default: `./${fixedPath}${jsExtension}`,
+          types: `./${fixedPath}.d${tsExtension}`,
         };
       } else {
         exportsMap[`./${fixedPath}`] = {
-          import: `./${fixedPath}.${jsExtension}`,
-          default: `./${fixedPath}.${jsExtension}`,
-          types: `./${fixedPath}.d.${tsExtension}`,
+          import: `./${fixedPath}${jsExtension}`,
+          default: `./${fixedPath}${jsExtension}`,
+          types: `./${fixedPath}.d${tsExtension}`,
         };
       }
     } else {
-      exportsMap[`./${fixedPath}`] = `./${fixedPath}${extension}`;
+      if (extension.endsWith('.cjs') || extension.endsWith('.js')) {
+        exportsMap[`./${fixedPath}`] = {
+          import: `./${fixedPath}${jsExtension}`,
+          default: `./${fixedPath}${jsExtension}`,
+          types: `./${fixedPath}.d${tsExtension}`,
+        };
+      }
     }
   }
 
@@ -96,6 +102,7 @@ export const postBuildScript = ({
   onPackageVersionChanged,
   updateVersion,
   onDone,
+  useBuildDirForExportsMap,
 }: PostBuildScriptConfig) => {
   const packageJson = new PackageJsonManager(`${rootDir}/package.json`);
 
@@ -106,9 +113,9 @@ export const postBuildScript = ({
   const exportsMap: Record<string, any> = {
     ...(packageJson.data.exports ??
       buildExportsMap(
-        srcDirName,
+        useBuildDirForExportsMap ? buildDir : srcDirName,
         {},
-        srcDirName,
+        useBuildDirForExportsMap ? buildDir : srcDirName,
         filterExportsPathFn || defaultFilterExportsPathFunction,
       )!),
     './package.json': './package.json',

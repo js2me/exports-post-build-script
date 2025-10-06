@@ -10,6 +10,7 @@ export type FilterExportsPathFunction = (
 ) => boolean;
 
 export interface PostBuildScriptConfig {
+  useBuildDirForExportsMap?: boolean;
   /**
    * Директория для сборки.
    */
