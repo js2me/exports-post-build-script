@@ -17,8 +17,13 @@ cli
     '--fillDist',
     'Fill dist directory (copies package.json, README.md, LICENSE, assets)',
   )
-  .action(({ fillDist }) => {
-    $('pnpm exec zshy');
+  .option('--useTsc', 'Use just tsc')
+  .action(({ fillDist, useTsc }) => {
+    if (useTsc) {
+      $('pnpm exec tsc');
+    } else {
+      $('pnpm exec zshy');
+    }
 
     if (!fillDist) {
       return;
