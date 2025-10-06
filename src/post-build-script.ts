@@ -44,27 +44,30 @@ const buildExportsMap = (
       return; // Если путь исключен, выходим из функции
     }
 
+    const jsExtension = extension.endsWith('cjs') ? '.cjs' : '.js';
+    const tsExtension = extension.endsWith('cjs') ? '.cts' : '.ts';
+
     // Проверка, является ли файл TypeScript
     if (extension === '.ts' || extension === '.tsx') {
       // Обработка файла index
       if (fixedPath === 'index') {
         exportsMap[`.`] = {
-          import: `./${fixedPath}.js`,
-          default: `./${fixedPath}.js`,
-          types: `./${fixedPath}.d.ts`,
+          import: `./${fixedPath}.${jsExtension}`,
+          default: `./${fixedPath}.${jsExtension}`,
+          types: `./${fixedPath}.d.${tsExtension}`,
         };
         // Обработка других файлов с индексом в конце пути
       } else if (fixedPath.endsWith('/index')) {
         exportsMap[`./${fixedPath.split('/').slice(0, -1).join('/')}`] = {
-          import: `./${fixedPath}.js`,
-          default: `./${fixedPath}.js`,
-          types: `./${fixedPath}.d.ts`,
+          import: `./${fixedPath}.${jsExtension}`,
+          default: `./${fixedPath}.${jsExtension}`,
+          types: `./${fixedPath}.d.${tsExtension}`,
         };
       } else {
         exportsMap[`./${fixedPath}`] = {
-          import: `./${fixedPath}.js`,
-          default: `./${fixedPath}.js`,
-          types: `./${fixedPath}.d.ts`,
+          import: `./${fixedPath}.${jsExtension}`,
+          default: `./${fixedPath}.${jsExtension}`,
+          types: `./${fixedPath}.d.${tsExtension}`,
         };
       }
     } else {
