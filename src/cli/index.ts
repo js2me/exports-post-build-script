@@ -11,6 +11,84 @@ import { PackageJsonManager } from '../utils/package-json-manager.js';
 
 const cli = cac('sborshik');
 
+const fillDistAction = () => {
+  postBuildScript({
+    buildDir: 'dist',
+    rootDir: '.',
+    srcDirName: 'src',
+    filesToCopy: ['LICENSE', 'README.md'],
+  });
+
+  const pckgJson = new PackageJsonManager(
+    path.join(process.cwd(), './dist/package.json'),
+  );
+
+  if (pckgJson.data.zshy) {
+    delete pckgJson.data.zshy;
+
+    const sourcePckgJson = new PackageJsonManager(
+      path.join(process.cwd(), './package.json'),
+    );
+
+    delete sourcePckgJson.data.files;
+    delete sourcePckgJson.data.exports;
+    delete sourcePckgJson.data.main;
+    delete sourcePckgJson.data.module;
+    delete sourcePckgJson.data.types;
+    delete sourcePckgJson.data.bin;
+
+    pckgJson.data.files = ['*'];
+
+    const removeDistFromExport = (
+      value: Record<string, any> | string,
+    ): string | Record<string, any> => {
+      if (typeof value === 'string') {
+        return value.replace('./dist/', './');
+      } else {
+        return Object.fromEntries(
+          Object.entries(value).map(([key, value]) => [
+            key,
+            removeDistFromExport(value),
+          ]),
+        );
+      }
+    };
+
+    if (pckgJson.data.main) {
+      pckgJson.data.main = removeDistFromExport(pckgJson.data.main);
+    }
+
+    if (pckgJson.data.module) {
+      pckgJson.data.module = removeDistFromExport(pckgJson.data.module);
+    }
+
+    if (pckgJson.data.types) {
+      pckgJson.data.types = removeDistFromExport(pckgJson.data.types);
+    }
+
+    if (pckgJson.data.bin) {
+      pckgJson.data.bin = removeDistFromExport(pckgJson.data.bin);
+
+      if (pckgJson.data.type === 'module') {
+        if (pckgJson.data.bin.endsWith('.cjs')) {
+          pckgJson.data.bin = `${pckgJson.data.bin.slice(0, -3)}js`;
+        }
+      } else if (pckgJson.data.bin.endsWith('.js')) {
+        pckgJson.data.bin = `${pckgJson.data.bin.slice(0, -2)}cjs`;
+      }
+    }
+
+    if (pckgJson.data.exports) {
+      Object.entries(pckgJson.data.exports).forEach(([key, value]) => {
+        pckgJson.data.exports[key] = removeDistFromExport(value as any);
+      });
+    }
+
+    pckgJson.syncWithFs();
+    sourcePckgJson.syncWithFs();
+  }
+};
+
 cli
   .command('build', 'Build project using "zshy"')
   .option(
@@ -29,82 +107,12 @@ cli
       return;
     }
 
-    postBuildScript({
-      buildDir: 'dist',
-      rootDir: '.',
-      srcDirName: 'src',
-      filesToCopy: ['LICENSE', 'README.md'],
-    });
-
-    const pckgJson = new PackageJsonManager(
-      path.join(process.cwd(), './dist/package.json'),
-    );
-
-    if (pckgJson.data.zshy) {
-      delete pckgJson.data.zshy;
-
-      const sourcePckgJson = new PackageJsonManager(
-        path.join(process.cwd(), './package.json'),
-      );
-
-      delete sourcePckgJson.data.files;
-      delete sourcePckgJson.data.exports;
-      delete sourcePckgJson.data.main;
-      delete sourcePckgJson.data.module;
-      delete sourcePckgJson.data.types;
-      delete sourcePckgJson.data.bin;
-
-      pckgJson.data.files = ['*'];
-
-      const removeDistFromExport = (
-        value: Record<string, any> | string,
-      ): string | Record<string, any> => {
-        if (typeof value === 'string') {
-          return value.replace('./dist/', './');
-        } else {
-          return Object.fromEntries(
-            Object.entries(value).map(([key, value]) => [
-              key,
-              removeDistFromExport(value),
-            ]),
-          );
-        }
-      };
-
-      if (pckgJson.data.main) {
-        pckgJson.data.main = removeDistFromExport(pckgJson.data.main);
-      }
-
-      if (pckgJson.data.module) {
-        pckgJson.data.module = removeDistFromExport(pckgJson.data.module);
-      }
-
-      if (pckgJson.data.types) {
-        pckgJson.data.types = removeDistFromExport(pckgJson.data.types);
-      }
-
-      if (pckgJson.data.bin) {
-        pckgJson.data.bin = removeDistFromExport(pckgJson.data.bin);
-
-        if (pckgJson.data.type === 'module') {
-          if (pckgJson.data.bin.endsWith('.cjs')) {
-            pckgJson.data.bin = `${pckgJson.data.bin.slice(0, -3)}js`;
-          }
-        } else if (pckgJson.data.bin.endsWith('.js')) {
-          pckgJson.data.bin = `${pckgJson.data.bin.slice(0, -2)}cjs`;
-        }
-      }
-
-      if (pckgJson.data.exports) {
-        Object.entries(pckgJson.data.exports).forEach(([key, value]) => {
-          pckgJson.data.exports[key] = removeDistFromExport(value as any);
-        });
-      }
-
-      pckgJson.syncWithFs();
-      sourcePckgJson.syncWithFs();
-    }
+    fillDistAction();
   });
+
+cli.command('fill-dist').action(() => {
+  fillDistAction();
+});
 
 cli
   .command('publish')
