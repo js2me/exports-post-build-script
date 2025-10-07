@@ -24,6 +24,7 @@ export const buildExportsMap = (
         exportsMap,
         srcDirName,
         filterExportsPathFunction,
+        opts,
       );
     });
   } else {
