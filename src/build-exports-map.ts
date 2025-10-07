@@ -8,6 +8,7 @@ export const buildExportsMap = (
   exportsMap: Record<string, any>,
   srcDirName: string,
   filterExportsPathFunction?: FilterExportsPathFunction | undefined | null,
+  opts?: { addRequire?: boolean },
 ) => {
   const pathstat = fs.lstatSync(targetPath); // Получение информации о файле или директории
 
@@ -47,37 +48,47 @@ export const buildExportsMap = (
       return;
     }
 
+    const buildExportObj = () => {
+      const exportObj: Record<string, string> = {
+        import: `./${fixedPath}${jsExtension}`,
+        default: `./${fixedPath}${jsExtension}`,
+        types: `./${fixedPath}.d${tsExtension}`,
+      };
+
+      if (opts?.addRequire) {
+        exportObj.require = `./${fixedPath}.cjs`;
+      }
+
+      return exportObj;
+    };
+
     // Проверка, является ли файл TypeScript
     if (extension === '.ts' || extension === '.tsx') {
       // Обработка файла index
       if (fixedPath === 'index') {
-        exportsMap[`.`] = {
-          import: `./${fixedPath}${jsExtension}`,
-          default: `./${fixedPath}${jsExtension}`,
-          types: `./${fixedPath}.d${tsExtension}`,
-        };
+        exportsMap[`.`] = buildExportObj();
         // Обработка других файлов с индексом в конце пути
       } else if (fixedPath.endsWith('/index')) {
-        exportsMap[`./${fixedPath.split('/').slice(0, -1).join('/')}`] = {
-          import: `./${fixedPath}${jsExtension}`,
-          default: `./${fixedPath}${jsExtension}`,
-          types: `./${fixedPath}.d${tsExtension}`,
-        };
+        exportsMap[`./${fixedPath.split('/').slice(0, -1).join('/')}`] =
+          buildExportObj();
       } else {
-        exportsMap[`./${fixedPath}`] = {
-          import: `./${fixedPath}${jsExtension}`,
-          default: `./${fixedPath}${jsExtension}`,
-          types: `./${fixedPath}.d${tsExtension}`,
-        };
+        exportsMap[`./${fixedPath}`] = buildExportObj();
       }
     } else {
       if (extension.endsWith('.cjs') || extension.endsWith('.js')) {
-        exportsMap[`./${fixedPath}`] = {
-          import: `./${fixedPath}${jsExtension}`,
-          default: `./${fixedPath}${jsExtension}`,
-          types: `./${fixedPath}.d${tsExtension}`,
-        };
-      } else {
+        exportsMap[`./${fixedPath}`] = buildExportObj();
+      } else if (
+        [
+          '.d.ts',
+          '.ts',
+          '.map',
+          '.ctx',
+          '.cts',
+          '.d.cts',
+          '.d.ts.map',
+          '.d.cts.map',
+        ].every((ending) => !targetPath.endsWith(ending))
+      ) {
         exportsMap[`./${fixedPath}`] = `./${fixedPath}${extension}`;
       }
     }

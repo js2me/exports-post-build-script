@@ -27,6 +27,7 @@ export const postBuildScript = ({
   updateVersion,
   onDone,
   useBuildDirForExportsMap,
+  addRequireToExportsMap,
 }: PostBuildScriptConfig) => {
   const packageJson = new PackageJsonManager(`${rootDir}/package.json`);
 
@@ -41,6 +42,9 @@ export const postBuildScript = ({
         {},
         useBuildDirForExportsMap ? buildDir : srcDirName,
         filterExportsPathFn || defaultFilterExportsPathFunction,
+        {
+          addRequire: addRequireToExportsMap,
+        },
       )!),
     './package.json': './package.json',
   };
