@@ -47,6 +47,12 @@ const buildExportsMap = (
     const jsExtension = extension.endsWith('cjs') ? '.cjs' : '.js';
     const tsExtension = extension.endsWith('cjs') ? '.cts' : '.ts';
 
+    const isDts = targetPath.endsWith('.d.ts') || targetPath.endsWith('.d.cts');
+
+    if (isDts) {
+      return;
+    }
+
     // Проверка, является ли файл TypeScript
     if (extension === '.ts' || extension === '.tsx') {
       // Обработка файла index
