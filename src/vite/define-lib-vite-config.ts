@@ -59,7 +59,13 @@ export const defineLibViteConfig = (
             },
             onDone: (_, pckgJson) => {
               const subimports = configsManager.entries
-                .filter((entry) => entry.importName.split('/').length > 1)
+                .filter((entry) => {
+                  const kek = entry.entryPath.replace(
+                    `${configsManager.sourceCodeRelativeDir}/`,
+                    '',
+                  );
+                  return kek.split('/').length > 1;
+                })
                 .map((entry) => {
                   return `./${entry.importName.split('/').slice(1).join('/')}`;
                 });
