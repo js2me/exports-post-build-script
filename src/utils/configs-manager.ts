@@ -19,27 +19,24 @@ interface EntryItem {
 export class ConfigsManager {
   tsconfigPath: string;
   packagePath: string;
-  sourceCodeDir: string;
+  sourceCodeRelativeDir: string;
+  sourceCodeFullDir: string;
 
-  package: Record<string, any>;
-  tsconfig: Record<string, any>;
+  package!: Record<string, any>;
+  tsconfig!: Record<string, any>;
 
   private constructor(
     public rootPath: string = process.cwd(),
     opts?: { tsconfigName?: string; sourceCodeDir?: string },
   ) {
-    this.sourceCodeDir = opts?.sourceCodeDir ?? './src';
+    this.sourceCodeRelativeDir = opts?.sourceCodeDir ?? './src';
+    this.sourceCodeFullDir = resolve(rootPath, this.sourceCodeRelativeDir);
     this.tsconfigPath = resolve(
       rootPath,
       `./${opts?.tsconfigName ?? 'tsconfig'}.json`,
     );
     this.packagePath = resolve(rootPath, `./package.json`);
-    this.tsconfig = this.readJson(this.tsconfigPath);
-    this.package = this.readJson(this.packagePath);
-  }
-
-  readJson(path: string) {
-    return JSON.parse(readFileSync(resolve(this.rootPath, path)).toString());
+    this.refreshConfigs();
   }
 
   get ghRepoData() {
@@ -71,7 +68,7 @@ export class ConfigsManager {
         {
           importName: this.package.name,
           relativeName: 'index',
-          entryPath: `${this.sourceCodeDir}/index.ts`,
+          entryPath: `${this.sourceCodeRelativeDir}/index.ts`,
         },
       ];
     }
@@ -94,9 +91,18 @@ export class ConfigsManager {
     );
   }
 
-  sync() {
+  refreshConfigs() {
+    this.tsconfig = this.readJson(this.tsconfigPath);
+    this.package = this.readJson(this.packagePath);
+  }
+
+  syncConfigs() {
     writeFileSync(this.tsconfigPath, JSON.stringify(this.tsconfig, null, 2));
     writeFileSync(this.packagePath, JSON.stringify(this.package, null, 2));
+  }
+
+  readJson(path: string) {
+    return JSON.parse(readFileSync(resolve(this.rootPath, path)).toString());
   }
 
   static create(rootPath: string, opts?: { tsconfigName?: string }) {
