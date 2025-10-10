@@ -1,5 +1,6 @@
 import { defineConfig, mergeConfig, type UserConfig } from 'vite';
 import dts from 'vite-plugin-dts';
+import { postBuildScript } from '../post-build-script.js';
 import type { ConfigsManager } from '../utils/configs-manager.js';
 
 export const defineLibViteConfig = (
@@ -43,7 +44,61 @@ export const defineLibViteConfig = (
       },
     },
     resolve: {},
-    plugins: [dts()],
+    plugins: [
+      dts(),
+      {
+        name: 'post-build-fill-dist',
+        writeBundle(options) {
+          postBuildScript({
+            buildDir: options.dir!,
+            rootDir: '.',
+            srcDirName: 'src',
+            useBuildDirForExportsMap: true,
+            filterExportsPathFn: (path) => {
+              return path.startsWith('~');
+            },
+            onDone: (_, pckgJson) => {
+              const subimports = configsManager.entries
+                .filter((entry) => entry.importName.split('/').length > 1)
+                .map((entry) => {
+                  return `./${entry.importName.split('/').slice(1).join('/')}`;
+                });
+              const subimportsSet = new Set(subimports);
+
+              Object.keys(pckgJson.data.exports).forEach((exportPath) => {
+                if (typeof pckgJson.data.exports[exportPath] !== 'object') {
+                  return;
+                }
+
+                if (exportPath === './index') {
+                  const exportMap = pckgJson.data.exports[exportPath];
+                  delete pckgJson.data.exports[exportPath];
+                  pckgJson.data.exports['.'] = exportMap;
+                  exportPath = '.';
+                }
+
+                if (!pckgJson.data.exports[exportPath].require) {
+                  pckgJson.data.exports[exportPath].require =
+                    pckgJson.data.exports[exportPath].import.replace(
+                      '.js',
+                      '.cjs',
+                    );
+                }
+
+                if (subimportsSet.has(exportPath)) {
+                  pckgJson.data.exports[exportPath].types =
+                    `${exportPath}/index.d.ts`;
+                }
+              });
+
+              pckgJson.syncWithFs();
+            },
+            addRequireToExportsMap: true,
+            filesToCopy: ['LICENSE', 'README.md'],
+          });
+        },
+      },
+    ],
   };
 
   return defineConfig(
