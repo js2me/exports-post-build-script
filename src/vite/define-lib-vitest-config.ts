@@ -7,7 +7,11 @@ export const defineLibVitestConfig = (
   config?: Partial<UserConfig>,
 ) => {
   const definedConfig: UserConfig = {
-    plugins: [react()],
+    plugins: [
+      react({
+        tsDecorators: true,
+      }),
+    ],
     test: {
       globals: true,
       environment: 'jsdom',
