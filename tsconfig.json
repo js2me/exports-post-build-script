@@ -14,9 +14,10 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "skipDefaultLibCheck": true,
     "typeRoots": [
       "./node_modules/@types/", "./types", "./node_modules"
     ],
