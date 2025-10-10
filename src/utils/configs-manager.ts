@@ -107,7 +107,7 @@ export class ConfigsManager {
     return JSON.parse(readFileSync(resolve(this.rootPath, path)).toString());
   }
 
-  static create(rootPath: string, opts?: { tsconfigName?: string }) {
+  static create(rootPath?: string, opts?: { tsconfigName?: string }) {
     return new ConfigsManager(rootPath, opts);
   }
 }
