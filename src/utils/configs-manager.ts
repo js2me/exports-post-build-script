@@ -17,6 +17,7 @@ interface EntryItem {
 }
 
 export class ConfigsManager {
+  rootPath: string;
   tsconfigPath: string;
   packagePath: string;
   sourceCodeRelativeDir: string;
@@ -26,16 +27,17 @@ export class ConfigsManager {
   tsconfig!: Record<string, any>;
 
   private constructor(
-    public rootPath: string = process.cwd(),
+    rootPath?: string,
     opts?: { tsconfigName?: string; sourceCodeDir?: string },
   ) {
+    this.rootPath = rootPath ?? process.cwd();
     this.sourceCodeRelativeDir = opts?.sourceCodeDir ?? './src';
-    this.sourceCodeFullDir = resolve(rootPath, this.sourceCodeRelativeDir);
+    this.sourceCodeFullDir = resolve(this.rootPath, this.sourceCodeRelativeDir);
     this.tsconfigPath = resolve(
-      rootPath,
+      this.rootPath,
       `./${opts?.tsconfigName ?? 'tsconfig'}.json`,
     );
-    this.packagePath = resolve(rootPath, `./package.json`);
+    this.packagePath = resolve(this.rootPath, `./package.json`);
     this.refreshConfigs();
   }
 
