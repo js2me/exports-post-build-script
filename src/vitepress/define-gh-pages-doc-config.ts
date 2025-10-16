@@ -104,6 +104,9 @@ export const defineGhPagesDocConfig = (
       search: {
         provider: 'local',
       },
+      outline: {
+        level: [1, 3],
+      },
       ...config.themeConfig,
       footer: {
         message: pckgJson.license
