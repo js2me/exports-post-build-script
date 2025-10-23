@@ -2,9 +2,10 @@ import { minify } from 'htmlfy';
 
 import jsdom from 'jsdom';
 import { type DefaultTheme, defineConfig, type UserConfig } from 'vitepress';
+import type { ConfigsManager } from '../utils/configs-manager.js';
 
 export const defineGhPagesDocConfig = (
-  pckgJson: any,
+  configs: ConfigsManager,
   config: Omit<
     UserConfig<DefaultTheme.Config>,
     'transformHtml' | 'title' | 'base'
@@ -12,7 +13,7 @@ export const defineGhPagesDocConfig = (
 ) => {
   return defineConfig({
     ...config,
-    title: pckgJson.name.replace(/-/g, ' '),
+    title: configs.package.name.replace(/-/g, ' '),
     transformHtml(code) {
       const dom = new jsdom.JSDOM(code);
       const htmlDoc = dom.window.document.documentElement;
@@ -20,11 +21,12 @@ export const defineGhPagesDocConfig = (
 
       const descriptionEl = head.querySelector('meta[name="description"]')!;
 
-      const siteUrl = `https://${pckgJson.author}.github.io/${pckgJson.name}/`;
-      const siteTitle = `${pckgJson.name}`;
-      const siteBannerUrl = `https://${pckgJson.author}.github.io/${pckgJson.name}/banner.png`;
+      const siteUrl = `https://${configs.package.author}.github.io/${configs.package.name}/`;
+      const siteTitle = `${configs.package.name}`;
+      const siteBannerUrl = `https://${configs.package.author}.github.io/${configs.package.name}/banner.png`;
       const siteDescription =
-        pckgJson.description || `${pckgJson.name} documentation website`;
+        configs.package.description ||
+        `${configs.package.name} documentation website`;
 
       descriptionEl.setAttribute('content', siteDescription);
       descriptionEl.setAttribute('property', 'og:description');
@@ -44,11 +46,17 @@ export const defineGhPagesDocConfig = (
         },
         {
           name: 'meta',
-          attrs: { property: 'og:image:alt', content: `${pckgJson.name} logo` },
+          attrs: {
+            property: 'og:image:alt',
+            content: `${configs.package.name} logo`,
+          },
         },
         {
           name: 'meta',
-          attrs: { property: 'og:site_name', content: `${pckgJson.name}` },
+          attrs: {
+            property: 'og:site_name',
+            content: `${configs.package.name}`,
+          },
         },
         // Twitter tags
         {
@@ -57,7 +65,7 @@ export const defineGhPagesDocConfig = (
         },
         {
           name: 'meta',
-          attrs: { name: 'twitter:site', content: `${pckgJson.name}` },
+          attrs: { name: 'twitter:site', content: `${configs.package.name}` },
         },
         { name: 'meta', attrs: { name: 'twitter:title', content: siteTitle } },
         {
@@ -72,7 +80,7 @@ export const defineGhPagesDocConfig = (
           name: 'meta',
           attrs: {
             name: 'twitter:image:alt',
-            content: `${pckgJson.name} logo`,
+            content: `${configs.package.name} logo`,
           },
         },
       ];
@@ -89,14 +97,14 @@ export const defineGhPagesDocConfig = (
 
       return minify(htmlDoc.outerHTML);
     },
-    base: `/${pckgJson.name}/`,
+    base: `/${configs.package.name}/`,
     lastUpdated: true,
     sitemap: {
-      hostname: `https://${pckgJson.author}.github.io/${pckgJson.name}`,
+      hostname: `https://${configs.package.author}.github.io/${configs.package.name}`,
       lastmodDateOnly: false,
     },
     head: [
-      ['link', { rel: 'icon', href: `/${pckgJson.name}/logo.png` }],
+      ['link', { rel: 'icon', href: `/${configs.package.name}/logo.png` }],
       ...(config.head || []),
     ],
     themeConfig: {
@@ -109,16 +117,16 @@ export const defineGhPagesDocConfig = (
       },
       ...config.themeConfig,
       footer: {
-        message: pckgJson.license
-          ? `Released under the ${pckgJson.license} License.`
+        message: configs.package.license
+          ? `Released under the ${configs.package.license} License.`
           : 'No license',
-        copyright: `Copyright © ${config.createdYear || '2025'}-PRESENT ${pckgJson.author}`,
+        copyright: `Copyright © ${config.createdYear || '2025'}-PRESENT ${configs.package.author}`,
         ...config.themeConfig?.footer,
       },
       socialLinks: [
         {
           icon: 'github',
-          link: `https://github.com/${pckgJson.author}/${pckgJson.name}`,
+          link: `https://github.com/${configs.package.author}/${configs.package.name}`,
         },
         ...(config.themeConfig?.socialLinks || []),
       ],
