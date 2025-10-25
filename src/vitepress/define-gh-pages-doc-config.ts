@@ -2,6 +2,7 @@ import { minify } from 'htmlfy';
 
 import jsdom from 'jsdom';
 import { type DefaultTheme, defineConfig, type UserConfig } from 'vitepress';
+import llmstxt from 'vitepress-plugin-llms';
 import type { ConfigsManager } from '../utils/configs-manager.js';
 
 export const defineGhPagesDocConfig = (
@@ -107,6 +108,15 @@ export const defineGhPagesDocConfig = (
       ['link', { rel: 'icon', href: `/${configs.package.name}/logo.png` }],
       ...(config.head || []),
     ],
+    metaChunk: true,
+    cleanUrls: true,
+    vite: {
+      plugins: [
+        llmstxt({
+          workDir: '.',
+        }) as any,
+      ],
+    },
     themeConfig: {
       logo: '/logo.png',
       search: {

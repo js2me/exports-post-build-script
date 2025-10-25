@@ -9,6 +9,7 @@ export const defineDocsBuildConfig = (
   config?: UserConfig<DefaultTheme.Config>,
 ) => {
   const definedConfig = defineConfig({
+    base: `/${configs.package.name}/`,
     optimizeDeps: {
       exclude: ['@vueuse/core', 'vitepress'],
     },
