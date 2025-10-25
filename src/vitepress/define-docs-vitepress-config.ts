@@ -3,7 +3,7 @@ import { type DefaultTheme, defineConfig, type UserConfig } from 'vitepress';
 import llmstxt from 'vitepress-plugin-llms';
 import type { ConfigsManager } from '../utils/configs-manager.js';
 
-export const defineGhPagesDocConfig = (
+export const defineDocsVitepressConfig = (
   configs: ConfigsManager,
   config: Omit<
     UserConfig<DefaultTheme.Config>,
