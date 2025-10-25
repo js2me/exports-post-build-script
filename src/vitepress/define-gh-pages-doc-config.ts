@@ -1,5 +1,3 @@
-import { minify } from 'htmlfy';
-
 import jsdom from 'jsdom';
 import { type DefaultTheme, defineConfig, type UserConfig } from 'vitepress';
 import llmstxt from 'vitepress-plugin-llms';
@@ -96,7 +94,7 @@ export const defineGhPagesDocConfig = (
         })
         .join('\n')}`;
 
-      return minify(htmlDoc.outerHTML);
+      return htmlDoc.outerHTML;
     },
     base: `/${configs.package.name}/`,
     lastUpdated: true,
