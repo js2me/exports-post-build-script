@@ -31,6 +31,10 @@ export const defineLibViteConfig = (
       },
       rollupOptions: {
         external: [
+          'react',
+          'react-dom',
+          '@types/react',
+          '@types/react-dom',
           ...configsManager.entries.map((entry) => entry.importName),
           ...Object.keys(configsManager.package.peerDependencies ?? {}),
           ...Object.keys(configsManager.package.dependencies ?? {}),
