@@ -33,6 +33,8 @@ export const defineLibViteConfig = (
         external: [
           'react',
           'react-dom',
+          'react/jsx-runtime',
+          'react/jsx-dev-runtime',
           '@types/react',
           '@types/react-dom',
           ...configsManager.entries.map((entry) => entry.importName),
