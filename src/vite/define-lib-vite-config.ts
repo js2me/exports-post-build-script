@@ -51,7 +51,10 @@ export const defineLibViteConfig = (
     },
     resolve: {},
     plugins: [
-      dts(),
+      dts({
+        rollupTypes: true,
+        tsconfigPath: configsManager.tsconfigPath,
+      }),
       {
         name: 'post-build-fill-dist',
         writeBundle(options) {
