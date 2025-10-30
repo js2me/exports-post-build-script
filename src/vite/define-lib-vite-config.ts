@@ -52,7 +52,8 @@ export const defineLibViteConfig = (
     resolve: {},
     plugins: [
       dts({
-        rollupTypes: true,
+        pathsToAliases: true,
+        declarationOnly: true,
         tsconfigPath: configsManager.tsconfigPath,
       }),
       {
