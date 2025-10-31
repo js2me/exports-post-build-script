@@ -109,8 +109,13 @@ export class ConfigsManager {
   }
 
   syncConfigs() {
-    writeFileSync(this.tsconfigPath, JSON.stringify(this.tsconfig, null, 2));
-    writeFileSync(this.packagePath, JSON.stringify(this.package, null, 2));
+    if (this.tsconfig) {
+      writeFileSync(this.tsconfigPath, JSON.stringify(this.tsconfig, null, 2));
+    }
+
+    if (this.package) {
+      writeFileSync(this.packagePath, JSON.stringify(this.package, null, 2));
+    }
   }
 
   readJson(path: string) {
