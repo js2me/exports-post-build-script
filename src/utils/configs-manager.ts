@@ -175,4 +175,11 @@ export class ConfigsManager {
 
     return result;
   }
+
+  get tsconfigPaths(): Record<string, string[]> {
+    return (this.tsconfig.compilerOptions.paths || {}) as Record<
+      string,
+      string[]
+    >;
+  }
 }
