@@ -96,8 +96,16 @@ export class ConfigsManager {
   }
 
   refreshConfigs() {
-    this.tsconfig = this.readJson(this.tsconfigPath);
-    this.package = this.readJson(this.packagePath);
+    try {
+      this.package = this.readJson(this.packagePath);
+    } catch (_) {
+      this.package = null as any;
+    }
+    try {
+      this.tsconfig = this.readJson(this.tsconfigPath);
+    } catch (_) {
+      this.tsconfig = null as any;
+    }
   }
 
   syncConfigs() {
