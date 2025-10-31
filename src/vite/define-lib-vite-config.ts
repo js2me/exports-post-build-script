@@ -68,46 +68,41 @@ export const defineLibViteConfig = (
               return path.startsWith('~');
             },
             onDone: (_, pckgJson) => {
-              const subimports = configsManager.entries
-                .filter((entry) => {
-                  const kek = entry.entryPath.replace(
-                    `${configsManager.sourceCodeRelativeDir}/`,
-                    '',
-                  );
-                  return kek.split('/').length > 1;
-                })
-                .map((entry) => {
-                  return `./${entry.importName.split('/').slice(1).join('/')}`;
-                });
-              const subimportsSet = new Set(subimports);
-
-              Object.keys(pckgJson.data.exports).forEach((exportPath) => {
-                if (typeof pckgJson.data.exports[exportPath] !== 'object') {
-                  return;
-                }
-
-                if (exportPath === './index') {
-                  const exportMap = pckgJson.data.exports[exportPath];
-                  delete pckgJson.data.exports[exportPath];
-                  pckgJson.data.exports['.'] = exportMap;
-                  exportPath = '.';
-                }
-
-                if (!pckgJson.data.exports[exportPath].require) {
-                  pckgJson.data.exports[exportPath].require =
-                    pckgJson.data.exports[exportPath].import.replace(
-                      '.js',
-                      '.cjs',
-                    );
-                }
-
-                if (subimportsSet.has(exportPath)) {
-                  pckgJson.data.exports[exportPath].types =
-                    `${exportPath}/index.d.ts`;
-                }
-              });
-
-              pckgJson.syncWithFs();
+              // const subimports = configsManager.entries
+              //   .filter((entry) => {
+              //     const kek = entry.entryPath.replace(
+              //       `${configsManager.sourceCodeRelativeDir}/`,
+              //       '',
+              //     );
+              //     return kek.split('/').length > 1;
+              //   })
+              //   .map((entry) => {
+              //     return `./${entry.importName.split('/').slice(1).join('/')}`;
+              //   });
+              // const subimportsSet = new Set(subimports);
+              // Object.keys(pckgJson.data.exports).forEach((exportPath) => {
+              //   if (typeof pckgJson.data.exports[exportPath] !== 'object') {
+              //     return;
+              //   }
+              //   if (exportPath === './index') {
+              //     const exportMap = pckgJson.data.exports[exportPath];
+              //     delete pckgJson.data.exports[exportPath];
+              //     pckgJson.data.exports['.'] = exportMap;
+              //     exportPath = '.';
+              //   }
+              //   if (!pckgJson.data.exports[exportPath].require) {
+              //     pckgJson.data.exports[exportPath].require =
+              //       pckgJson.data.exports[exportPath].import.replace(
+              //         '.js',
+              //         '.cjs',
+              //       );
+              //   }
+              //   if (subimportsSet.has(exportPath)) {
+              //     pckgJson.data.exports[exportPath].types =
+              //       `${exportPath}/index.d.ts`;
+              //   }
+              // });
+              // pckgJson.syncWithFs();
             },
             addRequireToExportsMap: true,
             filesToCopy: ['LICENSE', 'README.md'],

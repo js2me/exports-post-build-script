@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import path, { resolve } from 'node:path';
 
 interface EntryItem {
   /**
@@ -25,6 +25,8 @@ export class ConfigsManager {
 
   package!: Record<string, any>;
   tsconfig!: Record<string, any>;
+
+  private cache = new Map<string, any>();
 
   private constructor(
     rootPath?: string,
@@ -109,5 +111,68 @@ export class ConfigsManager {
 
   static create(rootPath?: string, opts?: { tsconfigName?: string }) {
     return new ConfigsManager(rootPath, opts);
+  }
+
+  get externalDeps(): string[] {
+    if (this.cache.has('external-deps')) {
+      return this.cache.get('external-deps')!;
+    }
+
+    function collectAllDependencies(
+      pkgPath: string,
+      collected = new Set<string>(),
+    ): Set<string> {
+      try {
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+
+        const allDeps = {
+          ...pkg.dependencies,
+          ...pkg.peerDependencies,
+        };
+
+        for (const depName of Object.keys(allDeps)) {
+          // Пропускаем уже собранные
+          if (collected.has(depName)) continue;
+
+          collected.add(depName);
+
+          // Ищем package.json зависимости
+          const depPkgPath = path.join('node_modules', depName, 'package.json');
+
+          if (existsSync(depPkgPath)) {
+            // Рекурсивно собираем зависимости этой зависимости
+            collectAllDependencies(depPkgPath, collected);
+          }
+        }
+
+        return collected;
+      } catch (_) {
+        return collected;
+      }
+    }
+
+    // Собираем все external зависимости
+    const allExternalDeps = collectAllDependencies('./package.json');
+
+    // Добавляем специфичные subpath exports для известных пакетов
+    const externalWithSubpaths = Array.from(allExternalDeps).flatMap((dep) => {
+      const subpaths = [dep];
+
+      // Для React добавляем subpath exports
+      if (dep === 'react') {
+        subpaths.push('react/jsx-runtime', 'react/jsx-dev-runtime');
+      }
+
+      return subpaths;
+    });
+
+    const result = [
+      ...externalWithSubpaths,
+      ...Object.keys(this.tsconfig?.compilerOptions?.paths || {}),
+    ];
+
+    this.cache.set('external-deps', result);
+
+    return result;
   }
 }
