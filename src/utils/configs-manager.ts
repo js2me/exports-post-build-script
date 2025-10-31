@@ -176,7 +176,10 @@ export class ConfigsManager {
     return result;
   }
 
-  get tsconfigPaths(): Record<string, string[]> {
+  /**
+   * @ -> .tsconfig.compilerOptions.paths
+   */
+  get pathAliasesFromTsConfig(): Record<string, string[]> {
     return (this.tsconfig.compilerOptions.paths || {}) as Record<
       string,
       string[]
