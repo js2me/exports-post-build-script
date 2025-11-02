@@ -29,7 +29,10 @@ export const defineLibViteConfig = (
   const sourceIndexTs = resolve(__dirname, 'src/index.ts');
   const hasSourceIndexTs = existsSync(sourceIndexTs);
 
-  if (hasSourceIndexTs) {
+  const hasIndexTsInTsConfigPathAlias =
+    !!configs.pathAliasesFromTsConfig[configs.package.name];
+
+  if (hasSourceIndexTs && !hasIndexTsInTsConfigPathAlias) {
     entry.index = sourceIndexTs;
   }
 
@@ -52,6 +55,12 @@ export const defineLibViteConfig = (
         entry,
         formats: ['es', 'cjs'],
         fileName: (format, entryName) => {
+          if (
+            hasIndexTsInTsConfigPathAlias &&
+            entryName === configs.package.name
+          ) {
+            return format === 'es' ? `index.js` : `index.cjs`;
+          }
           return format === 'es' ? `${entryName}.js` : `${entryName}.cjs`;
         },
       },
@@ -74,7 +83,16 @@ export const defineLibViteConfig = (
         async closeBundle() {
           console.log('\n📦 Generating bundled .d.ts files...\n');
 
-          for (const [name, entryPath] of Object.entries(entry)) {
+          for (const [rawName, entryPath] of Object.entries(entry)) {
+            let name = rawName;
+
+            if (
+              hasIndexTsInTsConfigPathAlias &&
+              rawName === configs.package.name
+            ) {
+              name = 'index';
+            }
+
             try {
               const bundle = await rollup({
                 input: entryPath,
