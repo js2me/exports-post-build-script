@@ -228,19 +228,19 @@ export const defineLibViteConfig = (
 
               if (defaultEntry) {
                 exportEntry.default = defaultEntry;
+
+                // Добавляем main поле только если мы нашли корневой тс файл
+                if (
+                  isIndexModule &&
+                  hasSourceIndexTs &&
+                  !distConfigs.package.main
+                ) {
+                  distConfigs.package.main = exportEntry.default;
+                }
               }
 
               // Определяем путь экспорта
               const exportPath = isIndexModule ? '.' : `./${moduleName}`;
-
-              // Добавляем main поле только если мы нашли корневой тс файл
-              if (
-                isIndexModule &&
-                hasSourceIndexTs &&
-                !distConfigs.package.main
-              ) {
-                distConfigs.package.main = exportEntry;
-              }
 
               exports[exportPath] = exportEntry;
             }
