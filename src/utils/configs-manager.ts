@@ -122,10 +122,6 @@ export class ConfigsManager {
     return JSON.parse(readFileSync(resolve(this.rootPath, path)).toString());
   }
 
-  static create(rootPath?: string, opts?: { tsconfigName?: string }) {
-    return new ConfigsManager(rootPath, opts);
-  }
-
   get externalDeps(): string[] {
     if (this.cache.has('external-deps')) {
       return this.cache.get('external-deps')!;
@@ -142,6 +138,22 @@ export class ConfigsManager {
           ...pkg.dependencies,
           ...pkg.peerDependencies,
         };
+
+        if (pkg.main) {
+          collected.add(pkg.name);
+        }
+
+        Object.keys(pkg.exports || {}).forEach((exportKey) => {
+          const exportPath = exportKey.startsWith('./')
+            ? exportKey.slice(2)
+            : exportKey;
+
+          if (exportPath === '.') {
+            collected.add(pkg.name);
+          } else {
+            collected.add(`${pkg.name}/${exportPath}`);
+          }
+        });
 
         for (const depName of Object.keys(allDeps)) {
           // Пропускаем уже собранные
@@ -167,20 +179,8 @@ export class ConfigsManager {
     // Собираем все external зависимости
     const allExternalDeps = collectAllDependencies('./package.json');
 
-    // Добавляем специфичные subpath exports для известных пакетов
-    const externalWithSubpaths = Array.from(allExternalDeps).flatMap((dep) => {
-      const subpaths = [dep];
-
-      // Для React добавляем subpath exports
-      if (dep === 'react') {
-        subpaths.push('react/jsx-runtime', 'react/jsx-dev-runtime');
-      }
-
-      return subpaths;
-    });
-
     const result = [
-      ...externalWithSubpaths,
+      ...allExternalDeps,
       ...Object.keys(this.tsconfig?.compilerOptions?.paths || {}),
     ];
 
@@ -197,5 +197,9 @@ export class ConfigsManager {
       string,
       string[]
     >;
+  }
+
+  static create(rootPath?: string, opts?: { tsconfigName?: string }) {
+    return new ConfigsManager(rootPath, opts);
   }
 }

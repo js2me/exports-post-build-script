@@ -235,7 +235,11 @@ export const defineLibViteConfig = (
                   hasSourceIndexTs &&
                   !distConfigs.package.main
                 ) {
-                  distConfigs.package.main = exportEntry.default;
+                  if (exportEntry.default.startsWith('./')) {
+                    exportEntry.default = exportEntry.default.slice(2);
+                  } else {
+                    distConfigs.package.main = exportEntry.default;
+                  }
                 }
               }
 
