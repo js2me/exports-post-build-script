@@ -15,6 +15,8 @@ export const defineLibViteConfig = (
     binPath?: string;
   },
 ) => {
+  const __dirname = configs.rootPath;
+
   const entry = Object.fromEntries(
     Object.entries(configs.pathAliasesFromTsConfig).map(([key, [value]]) => {
       const name = key.split('/').pop()!;
