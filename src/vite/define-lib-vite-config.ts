@@ -13,6 +13,7 @@ export const defineLibViteConfig = (
       error?: Error,
     ) => Promise<void>;
     binPath?: string;
+    extraFilesToCopy?: string[];
   },
 ) => {
   const __dirname = configs.rootPath;
@@ -26,8 +27,9 @@ export const defineLibViteConfig = (
   );
 
   const sourceIndexTs = resolve(__dirname, 'src/index.ts');
+  const hasSourceIndexTs = existsSync(sourceIndexTs);
 
-  if (existsSync(sourceIndexTs)) {
+  if (hasSourceIndexTs) {
     entry.index = sourceIndexTs;
   }
 
@@ -138,7 +140,12 @@ export const defineLibViteConfig = (
             console.log('\n📦 Preparing package.json for dist...\n');
 
             // Копируем файлы
-            const filesToCopy = ['LICENSE', 'README.md', 'package.json'];
+            const filesToCopy = [
+              'LICENSE',
+              'README.md',
+              'package.json',
+              ...(config?.extraFilesToCopy || []),
+            ];
 
             for (const file of filesToCopy) {
               if (existsSync(file)) {
@@ -197,6 +204,8 @@ export const defineLibViteConfig = (
               const hasCjs = existsSync(`dist/${moduleName}.cjs`);
               const hasDts = existsSync(`dist/${moduleName}.d.ts`);
 
+              const isIndexModule = moduleName === 'index';
+
               const exportEntry: any = {};
 
               // ВАЖНО: types должен быть первым!
@@ -212,9 +221,27 @@ export const defineLibViteConfig = (
                 exportEntry.require = `./${moduleName}.cjs`;
               }
 
+              const defaultEntry = [
+                exportEntry.import,
+                exportEntry.require,
+              ].filter(Boolean)[0];
+
+              if (defaultEntry) {
+                exportEntry.default = defaultEntry;
+              }
+
               // Определяем путь экспорта
-              const exportPath =
-                moduleName === 'index' ? '.' : `./${moduleName}`;
+              const exportPath = isIndexModule ? '.' : `./${moduleName}`;
+
+              // Добавляем main поле только если мы нашли корневой тс файл
+              if (
+                isIndexModule &&
+                hasSourceIndexTs &&
+                !distConfigs.package.main
+              ) {
+                distConfigs.package.main = exportEntry;
+              }
+
               exports[exportPath] = exportEntry;
             }
 
