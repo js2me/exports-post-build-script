@@ -49,6 +49,11 @@ export const defineLibViteConfig = (
 
   const externalDeps = [
     ...configs.externalDeps,
+    ...(Array.isArray(config?.build?.rollupOptions?.external)
+      ? config.build.rollupOptions.external.filter(
+          (it): it is string => typeof it === 'string',
+        )
+      : []),
     ...(config?.externalDeps || []),
   ];
 
