@@ -275,6 +275,13 @@ export const defineLibViteConfig = (
               // Определяем путь экспорта
               const exportPath = isIndexModule ? '.' : `./${moduleName}`;
 
+              if (Object.keys(exportEntry).length < 3) {
+                console.warn(
+                  `⚠️  Strange export entry for ${exportPath} (probably bad import in source code):`,
+                  exportEntry,
+                );
+              }
+
               exports[exportPath] = exportEntry;
             }
 
