@@ -14,6 +14,7 @@ export const defineLibViteConfig = (
     ) => Promise<void>;
     binPath?: string;
     extraFilesToCopy?: string[];
+    externalDeps?: string[];
   },
 ) => {
   const __dirname = configs.rootPath;
@@ -46,6 +47,11 @@ export const defineLibViteConfig = (
   let dtsGenerationComplete: PromiseWithResolvers<void> | undefined;
   let customScriptBeforeFinish: PromiseWithResolvers<void> | undefined;
 
+  const externalDeps = [
+    ...configs.externalDeps,
+    ...(config?.externalDeps || []),
+  ];
+
   const definedConfig = defineConfig({
     resolve: {
       alias,
@@ -65,7 +71,7 @@ export const defineLibViteConfig = (
         },
       },
       rollupOptions: {
-        external: configs.externalDeps,
+        external: externalDeps,
         output: {
           preserveModules: false,
         },
@@ -101,7 +107,7 @@ export const defineLibViteConfig = (
                     return true;
                   }
 
-                  return configs.externalDeps.some((dep) => id.startsWith(dep));
+                  return externalDeps.some((dep) => id.startsWith(dep));
                 },
                 plugins: [
                   dts({
