@@ -202,4 +202,12 @@ export class ConfigsManager {
   static create(rootPath?: string, opts?: { tsconfigName?: string }) {
     return new ConfigsManager(rootPath, opts);
   }
+
+  get sourceIndexTs() {
+    return resolve(this.rootPath, './src/index.ts');
+  }
+
+  get hasSourceIndexTs() {
+    return existsSync(this.sourceIndexTs);
+  }
 }
