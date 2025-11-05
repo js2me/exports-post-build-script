@@ -5,6 +5,7 @@ export interface PrepareDistDirConfig {
   extraFilesToCopy?: string[];
   binPath?: string;
   configs: ConfigsManager;
+  ignoredModuleNamesForExport?: string[];
 }
 
 export const prepareDistDir = async (config: PrepareDistDirConfig) => {
@@ -60,6 +61,10 @@ export const prepareDistDir = async (config: PrepareDistDirConfig) => {
         moduleName = moduleName.replace(/\.js$/, '');
       } else {
         return; // Пропускаем файлы с другими расширениями
+      }
+
+      if (config.ignoredModuleNamesForExport?.some((it) => it === moduleName)) {
+        return;
       }
 
       moduleNames.add(moduleName);
